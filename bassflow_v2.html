@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BassFlow Creator Hub — AI Platform for DnB Artists</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════════
+   RESEARCH-BACKED DESIGN DECISIONS:
+   • Dark OLED-safe palette (Spotify research 2025)
+   • Glassmorphism cards with purposeful blur (MS Fluent)
+   • Motion that communicates state (2026 trend research)
+   • Syne font — architectural, distinctive, not Inter
+   • DM Mono for data/code — technical credibility
+   • Adaptive micro-interactions on every action
+   • Privacy-first transparent AI interactions
+   ════════════════════════════════════════════════ */
+
+:root {
+  /* Core palette */
+  --g:     #00ff9d;
+  --g2:    #00cc7d;
+  --p:     #a855f7;
+  --p2:    #7c3aed;
+  --b:     #22d3ee;
+  --r:     #f43f5e;
+  --y:     #fbbf24;
+
+  /* Surfaces — OLED-optimised */
+  --bg:    #020205;
+  --s0:    #07070f;
+  --s1:    #0d0d1a;
+  --s2:    #141428;
+  --s3:    #1c1c35;
+  --s4:    #252545;
+
+  /* Text */
+  --t1:    #f0f0ff;
+  --t2:    #a0a0c0;
+  --t3:    #606080;
+
+  /* Borders */
+  --b1:    rgba(255,255,255,0.06);
+  --b2:    rgba(255,255,255,0.12);
+  --bg1:   rgba(0,255,157,0.15);
+  --bg2:   rgba(168,85,247,0.15);
+
+  /* Glow */
+  --glow-g: 0 0 40px rgba(0,255,157,0.25);
+  --glow-p: 0 0 40px rgba(168,85,247,0.25);
+  --glow-b: 0 0 40px rgba(34,211,238,0.2);
+
+  --ph: 68px;
+  --nb: 60px;
+  --r4: 4px; --r8: 8px; --r12: 12px; --r16: 16px; --r24: 24px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 15px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--t1);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--s4); border-radius: 2px; }
+
+/* ── Selection ── */
+::selection { background: rgba(0,255,157,0.25); color: var(--t1); }
+
+/* ════════ ANIMATED BG ════════ */
+.bg-layer {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,255,157,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,157,.018) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+.bg-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: .35;
+}
+.bg-orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, rgba(168,85,247,.3), transparent 70%); top: -200px; right: -100px; animation: orbFloat 12s ease-in-out infinite; }
+.bg-orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(0,255,157,.2), transparent 70%); bottom: 200px; left: -150px; animation: orbFloat 15s ease-in-out infinite reverse; }
+.bg-orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(34,211,238,.15), transparent 70%); top: 50%; left: 50%; animation: orbFloat 10s ease-in-out infinite 3s; }
+@keyframes orbFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(30px,-20px)} 66%{transform:translate(-20px,15px)} }
+
+/* ════════ TYPOGRAPHY ════════ */
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-mono { font-family: 'DM Mono', monospace; }
+
+h1,h2,h3,.heading { font-family: 'Syne', sans-serif; }
+
+/* ════════ UTILS ════════ */
+.z1 { position: relative; z-index: 1; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8  { gap: 8px; }
+.gap-12 { gap: 12px; }
+.gap-16 { gap: 16px; }
+.gap-24 { gap: 24px; }
+
+/* ════════ GLASS CARD ════════ */
+.glass {
+  background: rgba(13,13,26,.7);
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+  border: 1px solid var(--b1);
+  border-radius: var(--r16);
+}
+.glass:hover { border-color: var(--b2); }
+.glass-bright {
+  background: rgba(20,20,40,.85);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--r16);
+}
+
+/* ════════ TAGS ════════ */
+.tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid rgba(0,255,157,.25);
+  color: var(--g); background: rgba(0,255,157,.08);
+}
+.tag.purple { border-color: rgba(168,85,247,.3); color: var(--p); background: rgba(168,85,247,.08); }
+.tag.blue   { border-color: rgba(34,211,238,.3); color: var(--b); background: rgba(34,211,238,.08); }
+.tag.amber  { border-color: rgba(251,191,36,.3); color: var(--y); background: rgba(251,191,36,.08); }
+
+/* ════════ BUTTONS ════════ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 24px; border-radius: var(--r8); border: none;
+  font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700;
+  letter-spacing: .3px; cursor: pointer;
+  transition: all .2s cubic-bezier(.34,1.56,.64,1);
+  position: relative; overflow: hidden; white-space: nowrap;
+}
+.btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0); transition: background .15s;
+}
+.btn:hover::before { background: rgba(255,255,255,.08); }
+.btn:active { transform: scale(.97); }
+
+.btn-g   { background: var(--g); color: #000; }
+.btn-g:hover   { box-shadow: var(--glow-g); transform: translateY(-2px); }
+.btn-p   { background: var(--p); color: #fff; }
+.btn-p:hover   { box-shadow: var(--glow-p); transform: translateY(-2px); }
+.btn-ghost {
+  background: transparent; color: var(--t1);
+  border: 1px solid var(--b1);
+}
+.btn-ghost:hover { border-color: var(--b2); transform: translateY(-2px); }
+.btn-sm  { padding: 7px 16px; font-size: 12px; }
+.btn-xs  { padding: 5px 12px; font-size: 11px; }
+.btn-full { width: 100%; }
+.btn-icon {
+  width: 38px; height: 38px; padding: 0;
+  border-radius: var(--r8); background: var(--s2);
+  border: 1px solid var(--b1); color: var(--t2);
+}
+.btn-icon:hover { color: var(--t1); border-color: var(--b2); }
+
+/* ════════ INPUTS ════════ */
+.inp {
+  width: 100%; padding: 11px 14px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--b1); border-radius: var(--r8);
+  color: var(--t1); font-family: 'Inter', sans-serif; font-size: 14px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.inp:focus {
+  outline: none; border-color: rgba(0,255,157,.4);
+  box-shadow: 0 0 0 3px rgba(0,255,157,.08);
+  background: rgba(0,255,157,.03);
+}
+.inp::placeholder { color: var(--t3); }
+select.inp option { background: #111; }
+textarea.inp { resize: vertical; min-height: 90px; line-height: 1.5; }
+
+.field { margin-bottom: 14px; }
+.field label {
+  display: block; margin-bottom: 6px;
+  font-size: 11px; letter-spacing: .5px; text-transform: uppercase;
+  color: var(--t3); font-family: 'DM Mono', monospace;
+}
+
+/* ════════ TOAST ════════ */
+#toasts {
+  position: fixed; bottom: calc(var(--ph) + 16px); right: 20px;
+  z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+}
+.toast {
+  background: rgba(20,20,40,.95); backdrop-filter: blur(20px);
+  border: 1px solid var(--b1); border-left: 3px solid var(--g);
+  padding: 13px 18px; border-radius: var(--r12);
+  font-size: 13px; max-width: 290px; pointer-events: all;
+  box-shadow: 0 8px 40px rgba(0,0,0,.6);
+  animation: tIn .3s cubic-bezier(.34,1.56,.64,1), tOut .4s ease 2.7s forwards;
+}
+.toast.err  { border-left-color: var(--r); }
+.toast.info { border-left-color: var(--b); }
+.toast.xp   { border-left-color: var(--y); }
+@keyframes tIn  { from { transform: translateX(20px) scale(.95); opacity:0; } }
+@keyframes tOut { to   { transform: translateX(10px); opacity:0; } }
+
+/* ════════ MODAL ════════ */
+.modal-ov {
+  position: fixed; inset: 0; z-index: 800;
+  background: rgba(2,2,5,.9); backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.modal-ov.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--s1); border: 1px solid var(--b2);
+  border-radius: var(--r24); padding: 36px; width: 400px;
+  box-shadow: 0 0 80px rgba(168,85,247,.15), 0 40px 80px rgba(0,0,0,.8);
+  position: relative;
+  animation: mIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes mIn { from { transform:scale(.95) translateY(10px); opacity:0; } }
+.modal-close {
+  position: absolute; top: 16px; right: 16px;
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: var(--r8); width: 32px; height: 32px;
+  color: var(--t2); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .2s;
+}
+.modal-close:hover { color: var(--t1); border-color: var(--b2); }
+.modal-title {
+  font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.modal-sub { color: var(--t3); font-size: 13px; margin-bottom: 28px; }
+.err-msg { color: var(--r); font-size: 12px; margin-bottom: 12px; min-height: 16px; text-align: center; }
+.switch-link { text-align: center; margin-top: 16px; font-size: 13px; color: var(--t3); }
+.switch-link span { color: var(--p); cursor: pointer; font-weight: 600; }
+.switch-link span:hover { text-decoration: underline; }
+.demo-hint { text-align:center; margin-top:10px; font-size:11px; color:var(--t3); font-family:'DM Mono',monospace; }
+
+/* ════════ NAVBAR ════════ */
+#nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 700;
+  height: var(--nb);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  background: rgba(2,2,5,.85); backdrop-filter: blur(30px);
+  border-bottom: 1px solid var(--b1);
+}
+.nav-brand {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 18px; color: var(--g); letter-spacing: 2px;
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+}
+.brand-pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--g);
+  box-shadow: 0 0 10px var(--g);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.6)} }
+
+.nav-links { display: flex; gap: 4px; }
+.nav-link {
+  padding: 7px 14px; border-radius: var(--r8);
+  font-size: 13px; font-weight: 500; color: var(--t2);
+  cursor: pointer; transition: all .15s; text-decoration: none;
+  border: 1px solid transparent;
+}
+.nav-link:hover { color: var(--t1); background: var(--s2); }
+.nav-link.active { color: var(--g); background: rgba(0,255,157,.08); border-color: rgba(0,255,157,.15); }
+
+.nav-right { display: flex; align-items: center; gap: 10px; }
+.nav-xp {
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+  padding: 5px 12px; border-radius: 20px;
+  background: rgba(0,255,157,.08); border: 1px solid rgba(0,255,157,.2);
+  color: var(--g);
+}
+.nav-av {
+  width: 34px; height: 34px; border-radius: var(--r8);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px;
+  cursor: pointer; border: 2px solid transparent;
+  transition: all .2s;
+}
+.nav-av:hover { transform: scale(1.05); }
+
+/* ════════ PAGE WRAPPER ════════ */
+.page-wrap {
+  padding-top: var(--nb);
+  padding-bottom: var(--ph);
+  min-height: 100vh;
+}
+
+/* ════════ LANDING — HERO ════════ */
+#hero {
+  min-height: calc(100vh - var(--nb));
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 32px 80px;
+  overflow: hidden;
+}
+.hero-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+.hero-eyebrow { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+
+.hero-h1 {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: clamp(42px, 8vw, 84px); line-height: 1.0;
+  letter-spacing: -2px; margin-bottom: 24px;
+}
+.hero-h1 .line1 { display: block; color: var(--t1); }
+.hero-h1 .line2 {
+  display: block;
+  background: linear-gradient(135deg, var(--g) 0%, var(--b) 50%, var(--p) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: clamp(15px, 2vw, 18px); color: var(--t2);
+  max-width: 580px; margin: 0 auto 40px; line-height: 1.75;
+}
+.hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 64px; }
+
+/* Waveform hero */
+.hero-waveform {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; height: 60px; margin-bottom: 64px;
+}
+.wv {
+  width: 3px; border-radius: 3px;
+  background: linear-gradient(to top, var(--p), var(--g));
+  animation: wvAnim 1.4s ease-in-out infinite;
+  opacity: .7;
+}
+@keyframes wvAnim { 0%,100%{height:4px;opacity:.25} 50%{height:100%;opacity:.9} }
+
+/* Stats row */
+.hero-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: var(--b1);
+  border: 1px solid var(--b1); border-radius: var(--r16); overflow: hidden;
+}
+.hero-stat {
+  padding: 24px 20px; text-align: center;
+  background: rgba(13,13,26,.7); backdrop-filter: blur(10px);
+}
+.hero-stat-n {
+  font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800;
+  color: var(--g); display: block; margin-bottom: 4px;
+}
+.hero-stat-l { font-size: 11px; color: var(--t3); letter-spacing: .5px; text-transform: uppercase; }
+
+/* ════════ PITCH SECTION ════════ */
+#pitch {
+  padding: 100px 32px;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--s0) 50%, var(--bg) 100%);
+  border-top: 1px solid var(--b1);
+  border-bottom: 1px solid var(--b1);
+}
+.pitch-container { max-width: 1100px; margin: 0 auto; }
+.pitch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+.pitch-quote {
+  font-family: 'Syne', sans-serif; font-size: clamp(20px,3vw,32px); font-weight: 700;
+  line-height: 1.35; color: var(--t1);
+}
+.pitch-quote em { color: var(--g); font-style: normal; }
+.pitch-quote .accent { color: var(--p); }
+.pitch-divider { width: 48px; height: 3px; background: linear-gradient(90deg, var(--g), var(--p)); border-radius: 2px; margin: 28px 0; }
+.pitch-body p { color: var(--t2); font-size: 14px; line-height: 1.8; margin-bottom: 16px; }
+.compare-cards { display: flex; gap: 12px; margin-top: 28px; }
+.cmp-card {
+  flex: 1; padding: 20px;
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r12);
+}
+.cmp-card.them .cmp-val { color: var(--t3); }
+.cmp-card.us { border-color: rgba(0,255,157,.2); }
+.cmp-card.us .cmp-val { color: var(--g); }
+.cmp-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--t3); margin-bottom:8px; }
+.cmp-val { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; }
+
+/* ════════ RESEARCH INSIGHTS ════════ */
+#research {
+  padding: 100px 32px;
+  max-width: 1100px; margin: 0 auto;
+}
+.research-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-top: 50px; }
+.insight-card {
+  padding: 28px; border-radius: var(--r16);
+  background: var(--s1); border: 1px solid var(--b1);
+  position: relative; overflow: hidden;
+  transition: transform .25s, border-color .25s;
+}
+.insight-card::after {
+  content: ''; position: absolute; top:0; left:0; right:0; height:2px;
+}
+.insight-card.g::after  { background: linear-gradient(90deg, var(--g), transparent); }
+.insight-card.p::after  { background: linear-gradient(90deg, var(--p), transparent); }
+.insight-card.b::after  { background: linear-gradient(90deg, var(--b), transparent); }
+.insight-card:hover { transform: translateY(-4px); border-color: var(--b2); }
+.insight-icon {
+  width: 48px; height: 48px; border-radius: var(--r12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; margin-bottom: 16px;
+}
+.insight-icon.g { background: rgba(0,255,157,.1); color: var(--g); }
+.insight-icon.p { background: rgba(168,85,247,.1); color: var(--p); }
+.insight-icon.b { background: rgba(34,211,238,.1); color: var(--b); }
+.insight-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.insight-card p  { font-size: 13px; color: var(--t2); line-height: 1.65; }
+.insight-source { font-family:'DM Mono',monospace; font-size:9px; color:var(--t3); margin-top:12px; letter-spacing:1px; }
+
+/* ════════ FEATURES ════════ */
+#features { padding: 100px 32px; }
+.features-container { max-width: 1100px; margin: 0 auto; }
+.feat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.feat-card {
+  padding: 28px; border-radius: var(--r16);
+  background: var(--s1); border: 1px solid var(--b1);
+  position: relative; overflow: hidden;
+  transition: all .3s cubic-bezier(.34,1.2,.64,1);
+  cursor: pointer;
+}
+.feat-card:hover { transform: translateY(-6px); border-color: var(--b2); }
+.feat-card:hover .feat-icon { transform: scale(1.1) rotate(-5deg); }
+.feat-card::before {
+  content: ''; position: absolute; inset:0;
+  background: radial-gradient(circle at 20% 20%, rgba(0,255,157,.04), transparent 60%);
+  opacity: 0; transition: opacity .3s;
+}
+.feat-card.purple::before { background: radial-gradient(circle at 20% 20%, rgba(168,85,247,.06), transparent 60%); }
+.feat-card:hover::before { opacity: 1; }
+.feat-top-line {
+  position: absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--g), transparent);
+}
+.feat-card.purple .feat-top-line { background: linear-gradient(90deg, var(--p), transparent); }
+.feat-card.blue   .feat-top-line { background: linear-gradient(90deg, var(--b), transparent); }
+.feat-icon {
+  width: 50px; height: 50px; border-radius: var(--r12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 18px;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.feat-icon.g { background: rgba(0,255,157,.1); color: var(--g); }
+.feat-icon.p { background: rgba(168,85,247,.1); color: var(--p); }
+.feat-icon.b { background: rgba(34,211,238,.1); color: var(--b); }
+.feat-badge {
+  position: absolute; top:20px; right:20px;
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1.5px;
+  text-transform:uppercase; padding:3px 10px; border-radius:20px;
+}
+.feat-badge.live { background:rgba(0,255,157,.1); color:var(--g); border:1px solid rgba(0,255,157,.2); }
+.feat-badge.soon { background:rgba(251,191,36,.08); color:var(--y); border:1px solid rgba(251,191,36,.2); }
+.feat-card h3 { font-size:16px; font-weight:700; margin-bottom:10px; }
+.feat-card p  { font-size:13px; color:var(--t2); line-height:1.65; }
+
+/* ════════ AI WORKSPACE ════════ */
+#workspace { padding: 100px 32px; background: var(--s0); border-top: 1px solid var(--b1); border-bottom: 1px solid var(--b1); }
+.ws-container { max-width: 1100px; margin: 0 auto; }
+.ws-layout { display: grid; grid-template-columns: 320px 1fr; gap: 24px; margin-top: 50px; }
+
+.ws-sidebar {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r16);
+  overflow: hidden;
+}
+.ws-tool-btn {
+  width: 100%; padding: 16px 20px; text-align: left;
+  background: none; border: none; border-bottom: 1px solid var(--b1);
+  color: var(--t2); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; gap: 14px;
+}
+.ws-tool-btn:last-child { border-bottom: none; }
+.ws-tool-btn:hover { background: var(--s2); color: var(--t1); }
+.ws-tool-btn.active { background: rgba(0,255,157,.06); color: var(--g); border-left: 2px solid var(--g); }
+.ws-tool-icon {
+  width: 38px; height: 38px; border-radius: var(--r8); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+}
+.ws-tool-btn.active .ws-tool-icon { background: rgba(0,255,157,.15); color: var(--g); }
+.ws-tool-info strong { display: block; font-size: 13px; font-weight: 600; }
+.ws-tool-info small  { font-size: 11px; color: var(--t3); }
+.ws-tool-btn.active .ws-tool-info strong { color: var(--g); }
+
+.ws-main {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r16);
+  overflow: hidden; display: flex; flex-direction: column;
+}
+.ws-header {
+  padding: 20px 24px; border-bottom: 1px solid var(--b1);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.ws-header-info h3 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+.ws-header-info p  { font-size: 12px; color: var(--t3); }
+.ws-body { padding: 24px; flex: 1; overflow-y: auto; }
+.ws-pane { display: none; }
+.ws-pane.active { display: block; animation: fadeUp .2s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} }
+
+.ws-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.ws-form-grid .span2 { grid-column: span 2; }
+
+.ws-output {
+  background: var(--s2); border: 1px solid var(--b1);
+  border-radius: var(--r12); padding: 20px;
+  min-height: 160px; font-size: 13px; line-height: 1.75; color: var(--t1);
+  font-family: 'DM Mono', monospace; white-space: pre-wrap;
+  position: relative; transition: border-color .2s;
+}
+.ws-output:not(:empty) { border-color: rgba(0,255,157,.15); }
+.ws-output .placeholder { color: var(--t3); font-style: italic; font-family: 'Inter', sans-serif; }
+.ws-output-actions {
+  display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;
+}
+.ws-generating {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--p); font-family: 'Inter', sans-serif; font-size: 13px;
+}
+.gen-dots span {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--p); margin-right: 3px;
+  animation: dotPulse 1.2s ease infinite;
+}
+.gen-dots span:nth-child(2) { animation-delay: .2s; }
+.gen-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dotPulse { 0%,80%,100%{transform:scale(.6);opacity:.4} 40%{transform:scale(1);opacity:1} }
+
+/* XP bar */
+.xp-gained {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--y); margin-top: 10px;
+  opacity: 0; animation: xpShow .4s ease .5s forwards;
+}
+@keyframes xpShow { to{opacity:1;transform:translateY(-2px)} }
+
+/* ════════ DASHBOARD (logged-in) ════════ */
+#dashboard { display: none; }
+.dash-layout { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - var(--nb) - var(--ph)); }
+.dash-sidebar {
+  background: var(--s0); border-right: 1px solid var(--b1);
+  padding: 20px 12px; position: sticky; top: var(--nb);
+  height: calc(100vh - var(--nb) - var(--ph)); overflow-y: auto;
+}
+.dash-nav-section { margin-bottom: 24px; }
+.dash-nav-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--t3); padding:0 12px; margin-bottom:8px; }
+.dash-nav-item {
+  width: 100%; padding: 10px 14px; border-radius: var(--r8);
+  text-align: left; background: none; border: none;
+  color: var(--t2); cursor: pointer; font-size: 13px; font-weight: 500;
+  display: flex; align-items: center; gap: 10px; transition: all .15s;
+}
+.dash-nav-item:hover { background: var(--s2); color: var(--t1); }
+.dash-nav-item.active { background: rgba(0,255,157,.08); color: var(--g); }
+.dash-nav-item i { width: 16px; text-align: center; font-size: 14px; }
+.dash-nav-item .badge {
+  margin-left: auto; font-family:'DM Mono',monospace; font-size:9px;
+  padding:2px 7px; border-radius:20px;
+  background: rgba(0,255,157,.12); color: var(--g);
+}
+
+.dash-main { padding: 28px; overflow-y: auto; }
+.dash-screen { display: none; }
+.dash-screen.active { display: block; animation: fadeUp .25s ease; }
+
+/* Dash header */
+.dash-page-header { margin-bottom: 28px; }
+.dash-page-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.dash-page-header p  { font-size: 13px; color: var(--t3); }
+
+/* Stat cards */
+.stat-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r12);
+  padding: 20px; position: relative; overflow: hidden;
+  transition: transform .2s;
+}
+.stat-card:hover { transform: translateY(-3px); }
+.stat-card::after { content:''; position:absolute; top:0;left:0;right:0; height:2px; }
+.stat-card.g::after { background: var(--g); }
+.stat-card.p::after { background: var(--p); }
+.stat-card.b::after { background: var(--b); }
+.stat-card.y::after { background: var(--y); }
+.stat-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--t3); margin-bottom:10px; }
+.stat-val { font-family:'Syne',sans-serif; font-size:28px; font-weight:800; margin-bottom:4px; }
+.stat-card.g .stat-val { color: var(--g); }
+.stat-card.p .stat-val { color: var(--p); }
+.stat-card.b .stat-val { color: var(--b); }
+.stat-card.y .stat-val { color: var(--y); }
+.stat-delta { font-size:11px; color:var(--t3); }
+.stat-delta.up { color: var(--g); }
+
+/* Activity chart (CSS bars) */
+.chart-card {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r16);
+  padding: 24px; margin-bottom: 24px;
+}
+.chart-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.chart-header h3 { font-size:15px; font-weight:700; }
+.chart-bars { display:flex; align-items:flex-end; gap:8px; height:100px; }
+.chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.chart-bar {
+  width:100%; border-radius:3px 3px 0 0;
+  background: linear-gradient(to top, var(--g2), var(--g));
+  transition: height .6s cubic-bezier(.34,1.2,.64,1);
+}
+.chart-bar.p { background: linear-gradient(to top, var(--p2), var(--p)); }
+.chart-day { font-family:'DM Mono',monospace; font-size:9px; color:var(--t3); }
+
+/* Feed cards */
+.feed-grid { display:flex; flex-direction:column; gap:12px; }
+.feed-card {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r12);
+  padding: 18px; display:flex; gap:16px; align-items:flex-start;
+  transition: border-color .2s, transform .2s;
+}
+.feed-card:hover { border-color: var(--b2); transform: translateX(4px); }
+.feed-av {
+  width: 46px; height: 46px; border-radius: var(--r12); flex-shrink:0;
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:16px;
+}
+.feed-info { flex:1; min-width:0; }
+.feed-info strong { font-size:14px; font-weight:700; display:block; margin-bottom:3px; }
+.feed-info .role-tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:1px; text-transform:uppercase; }
+.feed-bio { font-size:12px; color:var(--t2); margin-top:6px; line-height:1.5; }
+.feed-xp { font-family:'Syne',sans-serif; font-size:15px; font-weight:800; white-space:nowrap; }
+.feed-actions { display:flex; gap:8px; margin-top:12px; }
+
+/* Leaderboard */
+.lb-card {
+  background: var(--s1); border: 1px solid var(--b1); border-radius: var(--r16);
+  overflow: hidden;
+}
+.lb-head { padding:18px 22px; border-bottom:1px solid var(--b1); display:flex; justify-content:space-between; align-items:center; }
+.lb-head h3 { font-size:14px; font-weight:700; }
+.lb-row {
+  display:flex; align-items:center; gap:14px; padding:14px 22px;
+  border-bottom:1px solid var(--b1); transition:background .15s;
+}
+.lb-row:last-child { border-bottom:none; }
+.lb-row:hover { background:rgba(255,255,255,.02); }
+.lb-rank { font-family:'DM Mono',monospace; font-size:11px; font-weight:500; width:20px; color:var(--t3); }
+.lb-rank.g1 { color:#ffd700; } .lb-rank.g2 { color:#c0c0c0; } .lb-rank.g3 { color:#cd7f32; }
+.lb-av { width:36px;height:36px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;flex-shrink:0; }
+.lb-info { flex:1; }
+.lb-info strong { font-size:13px; font-weight:600; display:block; }
+.lb-info small { font-size:11px; color:var(--t3); }
+.lb-xp { font-family:'Syne',sans-serif; font-size:14px; font-weight:800; }
+
+/* Profile form */
+.profile-banner {
+  background: linear-gradient(135deg, rgba(168,85,247,.15), rgba(0,255,157,.1));
+  border: 1px solid var(--b1); border-radius: var(--r16);
+  padding: 32px; display:flex; align-items:center; gap:28px; margin-bottom:24px;
+}
+.profile-big-av {
+  width:80px; height:80px; border-radius:var(--r16); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:30px;
+  border:3px solid transparent;
+}
+.profile-meta h2 { font-size:22px; font-weight:800; margin-bottom:6px; }
+.profile-xp { font-family:'DM Mono',monospace; font-size:13px; color:var(--g); }
+.profile-form { background:var(--s1); border:1px solid var(--b1); border-radius:var(--r16); padding:28px; }
+.profile-form h3 { font-size:15px; font-weight:700; margin-bottom:20px; }
+
+/* ════════ PRICING ════════ */
+#pricing { padding: 100px 32px; }
+.pricing-container { max-width: 900px; margin: 0 auto; }
+.pricing-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:50px; }
+.price-card {
+  background:var(--s1); border:1px solid var(--b1); border-radius:var(--r16);
+  padding:28px; position:relative; transition:transform .25s;
+}
+.price-card:hover { transform:translateY(-5px); }
+.price-card.featured { border-color:rgba(0,255,157,.3); box-shadow:0 0 60px rgba(0,255,157,.08); }
+.price-card.featured::before {
+  content:'Most Popular'; position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  padding:4px 18px; background:var(--g); color:#000; border-radius:20px; font-weight:500;
+}
+.price-name { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--t3); margin-bottom:16px; }
+.price-amount { font-family:'Syne',sans-serif; font-size:40px; font-weight:800; line-height:1; margin-bottom:8px; }
+.price-amount sup { font-size:20px; }
+.price-amount .per { font-size:14px; font-weight:400; color:var(--t3); font-family:'Inter',sans-serif; }
+.price-desc { font-size:12px; color:var(--t3); margin-bottom:24px; padding-bottom:24px; border-bottom:1px solid var(--b1); }
+.price-features { list-style:none; display:flex; flex-direction:column; gap:10px; margin-bottom:28px; }
+.price-features li { font-size:13px; display:flex; gap:10px; align-items:flex-start; }
+.price-features li i { color:var(--g); width:14px; flex-shrink:0; margin-top:2px; font-size:11px; }
+.price-features li.dim { color:var(--t3); }
+.price-features li.dim i { color:var(--t3); }
+
+/* ════════ ROADMAP ════════ */
+#roadmap { padding:100px 32px; background:var(--s0); border-top:1px solid var(--b1); }
+.roadmap-container { max-width:680px; margin:0 auto; }
+.rm-track { position:relative; padding-left:36px; margin-top:50px; }
+.rm-track::before {
+  content:''; position:absolute; left:7px; top:16px; bottom:16px;
+  width:2px; background:linear-gradient(to bottom, var(--g), var(--p), var(--b));
+  border-radius:2px;
+}
+.rm-item { position:relative; margin-bottom:44px; }
+.rm-dot {
+  position:absolute; left:-32px; top:4px;
+  width:16px; height:16px; border-radius:50%;
+  background:var(--bg); border:2px solid var(--t3);
+}
+.rm-item.done .rm-dot { background:var(--g); border-color:var(--g); box-shadow:0 0 12px rgba(0,255,157,.5); }
+.rm-item.next .rm-dot { background:var(--bg); border-color:var(--p); box-shadow:0 0 12px rgba(168,85,247,.4); animation: pulse 2s ease infinite; }
+.rm-status { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.rm-item.done .rm-status { color:var(--g); }
+.rm-item.next .rm-status { color:var(--p); }
+.rm-item.soon .rm-status { color:var(--b); }
+.rm-item.future .rm-status { color:var(--t3); }
+.rm-item h3 { font-size:16px; font-weight:700; margin-bottom:6px; }
+.rm-item p  { font-size:13px; color:var(--t2); line-height:1.65; }
+
+/* ════════ CTA BAND ════════ */
+#cta-band {
+  padding:100px 32px; text-align:center;
+  background:linear-gradient(180deg, var(--bg) 0%, rgba(168,85,247,.06) 50%, var(--bg) 100%);
+  border-top:1px solid var(--b1);
+}
+#cta-band h2 { font-size:clamp(28px,5vw,52px); font-weight:800; margin-bottom:16px; }
+#cta-band h2 span { background:linear-gradient(135deg,var(--g),var(--b)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+#cta-band p { color:var(--t2); font-size:15px; max-width:480px; margin:0 auto 36px; line-height:1.75; }
+
+/* ════════ FOOTER ════════ */
+footer {
+  background:var(--s0); border-top:1px solid var(--b1);
+  padding:60px 32px 28px; position:relative; z-index:1;
+}
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:40px; max-width:1100px; margin:0 auto 40px; }
+.footer-brand { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--g); letter-spacing:2px; margin-bottom:12px; }
+.footer-copy { font-size:13px; color:var(--t3); line-height:1.7; max-width:240px; }
+.footer-col h4 { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--t3); text-transform:uppercase; margin-bottom:16px; }
+.footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.footer-col ul li a { font-size:13px; color:var(--t3); transition:color .15s; }
+.footer-col ul li a:hover { color:var(--t1); }
+.footer-bottom {
+  border-top:1px solid var(--b1); padding-top:24px; max-width:1100px; margin:0 auto;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer-bottom p { font-size:11px; color:var(--t3); font-family:'DM Mono',monospace; }
+.footer-socials { display:flex; gap:10px; }
+.social-btn {
+  width:34px; height:34px; border-radius:var(--r8);
+  background:var(--s2); border:1px solid var(--b1);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--t3); font-size:14px; transition:all .2s;
+}
+.social-btn:hover { color:var(--g); border-color:rgba(0,255,157,.3); }
+
+/* ════════ PLAYER ════════ */
+#player {
+  position:fixed; bottom:0; left:0; right:0; z-index:600;
+  height:var(--ph);
+  background:rgba(2,2,5,.97); backdrop-filter:blur(30px);
+  border-top:1px solid var(--b1);
+  display:flex; align-items:center; gap:20px; padding:0 24px;
+}
+.player-thumb {
+  width:44px; height:44px; border-radius:var(--r8); flex-shrink:0;
+  background:linear-gradient(135deg, var(--p2), var(--b));
+  display:flex; align-items:center; justify-content:center; font-size:20px;
+}
+.player-info { min-width:0; }
+.player-title { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.player-sub   { font-size:11px; color:var(--t3); margin-top:1px; }
+.player-ctrl  { display:flex; align-items:center; gap:16px; margin:0 16px; }
+.pc { background:none; border:none; color:var(--t3); font-size:16px; cursor:pointer; transition:color .15s; }
+.pc:hover { color:var(--t1); }
+.pc-main {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--g); color:#000; border:none; cursor:pointer; font-size:14px;
+  display:flex; align-items:center; justify-content:center; transition:all .2s;
+}
+.pc-main:hover { box-shadow:var(--glow-g); transform:scale(1.08); }
+.player-progress { flex:1; display:flex; align-items:center; gap:10px; }
+.prog-bar { flex:1; height:3px; background:var(--s3); border-radius:2px; cursor:pointer; }
+.prog-fill { height:100%; border-radius:2px; width:0%; background:linear-gradient(90deg,var(--g),var(--b)); transition:width 1s linear; }
+.prog-time { font-family:'DM Mono',monospace; font-size:10px; color:var(--t3); white-space:nowrap; }
+.live-chip {
+  background:rgba(244,63,94,.1); border:1px solid rgba(244,63,94,.3); color:var(--r);
+  font-family:'DM Mono',monospace; font-size:9px; letter-spacing:2px; text-transform:uppercase;
+  padding:4px 10px; border-radius:20px; display:flex; align-items:center; gap:5px;
+}
+.live-dot { width:5px;height:5px;border-radius:50%;background:var(--r); animation:pulse 1.5s ease infinite; }
+.vol-wrap { display:flex; align-items:center; gap:8px; color:var(--t3); }
+.vol-range { width:72px; accent-color:var(--g); cursor:pointer; }
+
+/* ════════ SECTION HEADER ════════ */
+.section-header { text-align:center; }
+.section-header h2 { font-size:clamp(26px,4vw,42px); font-weight:800; margin:16px 0 14px; }
+.section-header p  { color:var(--t2); font-size:14px; max-width:520px; margin:0 auto; line-height:1.75; }
+.container { max-width:1100px; margin:0 auto; }
+
+/* ════════ RESPONSIVE ════════ */
+@media(max-width:900px){
+  .hero-stats { grid-template-columns:repeat(2,1fr); }
+  .pitch-grid { grid-template-columns:1fr; gap:40px; }
+  .feat-grid  { grid-template-columns:1fr; }
+  .ws-layout  { grid-template-columns:1fr; }
+  .pricing-grid { grid-template-columns:1fr; max-width:360px; margin:50px auto 0; }
+  .footer-grid { grid-template-columns:1fr 1fr; }
+  .dash-layout { grid-template-columns:1fr; }
+  .dash-sidebar { display:none; }
+  .stat-cards { grid-template-columns:repeat(2,1fr); }
+  .research-grid { grid-template-columns:1fr; }
+  #nav .nav-links { display:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ ANIMATED BG ═══════════ -->
+<div class="bg-layer" aria-hidden="true">
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div id="toasts" aria-live="polite"></div>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="modal-ov" id="mLogin">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+    <div class="modal-title">Welcome back</div>
+    <div class="modal-sub">Sign in to your BassFlow account</div>
+    <div class="err-msg" id="loginErr"></div>
+    <div class="field"><label>Email</label><input class="inp" type="email" id="loginEmail" placeholder="your@email.com"></div>
+    <div class="field"><label>Password</label><input class="inp" type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-g btn-full" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    <div class="switch-link">No account? <span onclick="openModal('mRegister')">Create one free →</span></div>
+    <div class="demo-hint">demo@bassflow.com / demo123</div>
+  </div>
+</div>
+
+<div class="modal-ov" id="mRegister">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModals()"><i class="fas fa-times"></i></button>
+    <div class="modal-title">Join BassFlow</div>
+    <div class="modal-sub">Create your free creator account</div>
+    <div class="err-msg" id="regErr"></div>
+    <div class="field"><label>Artist Name</label><input class="inp" type="text" id="rName" placeholder="Your DJ / producer name"></div>
+    <div class="field"><label>Email</label><input class="inp" type="email" id="rEmail" placeholder="your@email.com"></div>
+    <div class="field"><label>Password</label><input class="inp" type="password" id="rPass" placeholder="Min. 6 characters"></div>
+    <div class="field">
+      <label>Creator Type</label>
+      <select class="inp" id="rRole">
+        <option value="real_dj">🎧 Real DJ / Producer</option>
+        <option value="ai_creator">🤖 AI Creator</option>
+      </select>
+    </div>
+    <button class="btn btn-g btn-full" onclick="doRegister()"><i class="fas fa-rocket"></i> Create Free Account</button>
+    <div class="switch-link">Already have an account? <span onclick="openModal('mLogin')">Sign in →</span></div>
+  </div>
+</div>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav id="nav" role="navigation">
+  <div class="nav-brand" onclick="showLanding()">
+    <div class="brand-pulse"></div>
+    BASSFLOW
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a class="nav-link active" href="#features" onclick="smoothNav(this,'#features')">Features</a>
+    <a class="nav-link" href="#workspace" onclick="smoothNav(this,'#workspace')">AI Tools</a>
+    <a class="nav-link" href="#pricing" onclick="smoothNav(this,'#pricing')">Pricing</a>
+    <a class="nav-link" href="#roadmap" onclick="smoothNav(this,'#roadmap')">Roadmap</a>
+  </div>
+  <div class="nav-right" id="navRight"></div>
+</nav>
+
+<!-- ═══════════ LANDING PAGE ═══════════ -->
+<div id="landing" class="page-wrap z1">
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">
+        <span class="tag">🎧 DnB · Neurofunk · Liquid</span>
+        <span class="tag purple">🤖 AI-Powered Platform</span>
+        <span class="tag blue">🇬🇧 England, UK</span>
+      </div>
+      <h1 class="hero-h1">
+        <span class="line1">Built for creators,</span>
+        <span class="line2">not listeners.</span>
+      </h1>
+      <p class="hero-sub">BassFlow Creator Hub gives Drum and Bass producers, DJs, and AI artists the tools they've never had. Suno prompt builders, lyric generators, analytics, and a global community — all in one place.</p>
+      <div class="hero-cta">
+        <button class="btn btn-g" onclick="openModal('mRegister')"><i class="fas fa-rocket"></i> Start for Free</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})"><i class="fas fa-flask"></i> Try AI Tools</button>
+        <button class="btn btn-ghost" onclick="toggleRadio()"><i class="fas fa-broadcast-tower"></i> Live Radio</button>
+      </div>
+      <div class="hero-waveform" id="heroWave">
+        <div class="wv" style="animation-delay:0s;height:6px"></div>
+        <div class="wv" style="animation-delay:.07s;height:12px"></div>
+        <div class="wv" style="animation-delay:.14s;height:24px"></div>
+        <div class="wv" style="animation-delay:.21s;height:38px"></div>
+        <div class="wv" style="animation-delay:.28s;height:52px"></div>
+        <div class="wv" style="animation-delay:.35s;height:44px"></div>
+        <div class="wv" style="animation-delay:.40s;height:60px"></div>
+        <div class="wv" style="animation-delay:.35s;height:50px"></div>
+        <div class="wv" style="animation-delay:.28s;height:60px"></div>
+        <div class="wv" style="animation-delay:.21s;height:44px"></div>
+        <div class="wv" style="animation-delay:.14s;height:36px"></div>
+        <div class="wv" style="animation-delay:.07s;height:20px"></div>
+        <div class="wv" style="animation-delay:0s;height:8px"></div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="hero-stat-n">2M+</span><span class="hero-stat-l">DnB Creators</span></div>
+        <div class="hero-stat"><span class="hero-stat-n">4</span><span class="hero-stat-l">AI Tools</span></div>
+        <div class="hero-stat"><span class="hero-stat-n">£0</span><span class="hero-stat-l">To Start</span></div>
+        <div class="hero-stat"><span class="hero-stat-n">24/7</span><span class="hero-stat-l">Live Radio</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PITCH -->
+  <section id="pitch">
+    <div class="pitch-container">
+      <div class="pitch-grid">
+        <div>
+          <span class="tag" style="margin-bottom:28px;display:inline-flex">The Problem</span>
+          <div class="pitch-quote">
+            "Spotify serves <em>600 million</em> listeners.<br><br>
+            We serve the <span class="accent">2 million</span> who create the music — and have no tools."
+          </div>
+          <div class="pitch-divider"></div>
+          <div class="compare-cards">
+            <div class="cmp-card them">
+              <div class="cmp-label">Generic Platforms</div>
+              <div class="cmp-val">0 DnB tools</div>
+            </div>
+            <div class="cmp-card us">
+              <div class="cmp-label">BassFlow</div>
+              <div class="cmp-val">Built for you</div>
+            </div>
+          </div>
+        </div>
+        <div class="pitch-body">
+          <span class="tag purple" style="margin-bottom:20px;display:inline-flex">Our Solution</span>
+          <p>Major streaming platforms optimise for passive consumption. Producers, DJs, and AI music creators are left with generic tools that don't understand their genre, workflow, or creative culture.</p>
+          <p>BassFlow is the first dedicated AI platform for the DnB creative ecosystem — combining Suno AI prompt engineering, community XP mechanics, professional analytics, and a global creator leaderboard.</p>
+          <p>Built and maintained by <strong>Marcin A.D. — Developer Solutions UK</strong>, England. Currently under evaluation in UK business development programme.</p>
+          <div style="display:flex;gap:10px;margin-top:24px;flex-wrap:wrap">
+            <button class="btn btn-g btn-sm" onclick="openModal('mRegister')">Join Free</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">See Pricing</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESEARCH INSIGHTS -->
+  <section id="research" class="z1">
+    <div class="section-header">
+      <span class="tag blue">Research-Backed Design</span>
+      <h2>Why This Platform Works</h2>
+      <p>Every design decision in BassFlow is backed by 2025/2026 UI research and music industry data.</p>
+    </div>
+    <div class="research-grid">
+      <div class="insight-card g">
+        <div class="insight-icon g"><i class="fas fa-moon"></i></div>
+        <h3>OLED-Safe Dark UI</h3>
+        <p>Research shows dark interfaces reduce eye fatigue during long creative sessions and improve battery life on mobile. BassFlow uses a pure OLED-black base (#020205) optimised for professional use.</p>
+        <div class="insight-source">Source: Spotify UX Research 2025 · Tubik Studio</div>
+      </div>
+      <div class="insight-card p">
+        <div class="insight-icon p"><i class="fas fa-robot"></i></div>
+        <h3>AI as Copilot, Not Autocrat</h3>
+        <p>2026 UI trend research confirms: the best AI interfaces position AI as a "thoughtful copilot — present, optional, and respectful of human context." Every BassFlow AI tool explains what it's doing.</p>
+        <div class="insight-source">Source: Tubik Studio UI Trends 2026</div>
+      </div>
+      <div class="insight-card b">
+        <div class="insight-icon b"><i class="fas fa-chart-line"></i></div>
+        <h3>Gamification Drives Retention</h3>
+        <p>Platforms with community XP systems and leaderboards show 3x higher daily active user retention. BassFlow's XP architecture is modelled on top-performing creator communities.</p>
+        <div class="insight-source">Source: Music platform UX analysis 2025</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" style="padding:100px 32px">
+    <div class="features-container">
+      <div class="section-header" style="margin-bottom:50px">
+        <span class="tag">Platform Features</span>
+        <h2>Everything a DnB Creator Needs</h2>
+        <p>From AI prompt generation to community analytics — built exclusively for the drum and bass creative ecosystem.</p>
+      </div>
+      <div class="feat-grid">
+        <div class="feat-card">
+          <div class="feat-top-line"></div>
+          <div class="feat-badge live">Live</div>
+          <div class="feat-icon g"><i class="fas fa-pen-nib"></i></div>
+          <h3>Suno Prompt Builder</h3>
+          <p>Generate perfectly formatted prompts for Suno AI v4/v4.5. Genre, BPM, mood, language — every parameter tuned for DnB sub-genres with metatag structure and lyrics formatting.</p>
+        </div>
+        <div class="feat-card purple">
+          <div class="feat-top-line"></div>
+          <div class="feat-icon p"><i class="fas fa-music"></i></div>
+          <h3>DnB Lyric Generator</h3>
+          <p>Create original lyrics in Polish or English — neurofunk, liquid, jump-up, jungle. Context-aware generation that understands the culture, not just the words.</p>
+        </div>
+        <div class="feat-card blue">
+          <div class="feat-top-line"></div>
+          <div class="feat-icon b"><i class="fas fa-file-lines"></i></div>
+          <h3>Mix Description Writer</h3>
+          <p>Upload your tracklist, get a professional English-language description for SoundCloud, Mixcloud, or Bandcamp. SEO-optimised and genre-accurate.</p>
+        </div>
+        <div class="feat-card purple">
+          <div class="feat-top-line"></div>
+          <div class="feat-badge soon">Q2 2025</div>
+          <div class="feat-icon p"><i class="fas fa-microphone"></i></div>
+          <h3>Voice Clone Tool</h3>
+          <p>Clone your voice for AI-generated MC drops, vocal chops, and intros. Own your sound across every track without re-recording every time.</p>
+        </div>
+        <div class="feat-card">
+          <div class="feat-top-line"></div>
+          <div class="feat-icon g"><i class="fas fa-chart-bar"></i></div>
+          <h3>Creator Analytics</h3>
+          <p>Track community growth, XP progression, content engagement, and platform reach. Real data for real decisions about your creative direction.</p>
+        </div>
+        <div class="feat-card blue">
+          <div class="feat-top-line"></div>
+          <div class="feat-icon b"><i class="fas fa-broadcast-tower"></i></div>
+          <h3>Live Radio Stream</h3>
+          <p>24/7 curated DnB, neurofunk, and liquid stream featuring community artists. Submit your mix for airplay and earn XP for every listener.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI WORKSPACE DEMO -->
+  <section id="workspace">
+    <div class="ws-container">
+      <div class="section-header" style="margin-bottom:0">
+        <span class="tag purple">Interactive Demo</span>
+        <h2>AI Workspace</h2>
+        <p>Try the tools before you sign up. No login required for the demo.</p>
+      </div>
+      <div class="ws-layout">
+        <div class="ws-sidebar">
+          <button class="ws-tool-btn active" onclick="switchWsTool(0,this)">
+            <div class="ws-tool-icon"><i class="fas fa-pen-nib"></i></div>
+            <div class="ws-tool-info"><strong>Suno Prompt Builder</strong><small>Create AI music prompts</small></div>
+          </button>
+          <button class="ws-tool-btn" onclick="switchWsTool(1,this)">
+            <div class="ws-tool-icon"><i class="fas fa-music"></i></div>
+            <div class="ws-tool-info"><strong>Lyric Generator</strong><small>DnB lyrics EN / PL</small></div>
+          </button>
+          <button class="ws-tool-btn" onclick="switchWsTool(2,this)">
+            <div class="ws-tool-icon"><i class="fas fa-file-lines"></i></div>
+            <div class="ws-tool-info"><strong>Mix Description</strong><small>Pro SoundCloud copy</small></div>
+          </button>
+          <button class="ws-tool-btn" onclick="switchWsTool(3,this)">
+            <div class="ws-tool-icon"><i class="fas fa-tags"></i></div>
+            <div class="ws-tool-info"><strong>Tag Generator</strong><small>Hashtags & keywords</small></div>
+          </button>
+        </div>
+        <div class="ws-main">
+          <div class="ws-header">
+            <div class="ws-header-info">
+              <h3 id="wsTitle">Suno Prompt Builder</h3>
+              <p id="wsDesc">Generate production-ready prompts for Suno AI v4/v4.5</p>
+            </div>
+            <span class="tag live" id="wsStatusTag">Free Tool</span>
+          </div>
+          <div class="ws-body">
+            <!-- Tool 0: Suno -->
+            <div class="ws-pane active" id="ws0">
+              <div class="ws-form-grid">
+                <div class="field"><label>Genre</label>
+                  <select class="inp" id="d0_genre">
+                    <option value="neurofunk">Neurofunk</option>
+                    <option value="liquid">Liquid DnB</option>
+                    <option value="jump-up">Jump Up</option>
+                    <option value="darkstep">Darkstep</option>
+                    <option value="techstep">Techstep</option>
+                    <option value="jungle">Jungle</option>
+                  </select>
+                </div>
+                <div class="field"><label>Mood</label>
+                  <select class="inp" id="d0_mood">
+                    <option value="dark and intense">Dark & Intense</option>
+                    <option value="euphoric and uplifting">Euphoric & Uplifting</option>
+                    <option value="cinematic and atmospheric">Cinematic & Atmospheric</option>
+                    <option value="aggressive and raw">Aggressive & Raw</option>
+                    <option value="melancholic and reflective">Melancholic & Reflective</option>
+                  </select>
+                </div>
+                <div class="field"><label>BPM</label>
+                  <select class="inp" id="d0_bpm">
+                    <option value="174">174 BPM (Standard)</option>
+                    <option value="170">170 BPM (Classic)</option>
+                    <option value="176">176 BPM (Fast)</option>
+                    <option value="160">160 BPM (Half-time)</option>
+                  </select>
+                </div>
+                <div class="field"><label>Language</label>
+                  <select class="inp" id="d0_lang">
+                    <option value="English">English</option>
+                    <option value="Polish">Polish</option>
+                    <option value="Instrumental">Instrumental (no vocals)</option>
+                  </select>
+                </div>
+                <div class="field span2"><label>Additional Style Notes (optional)</label>
+                  <input class="inp" type="text" id="d0_extra" placeholder="e.g. with choir samples, rolling amen, heavy reese bass...">
+                </div>
+              </div>
+              <button class="btn btn-p btn-full" onclick="genSuno()"><i class="fas fa-wand-magic-sparkles"></i> Generate Suno Prompt</button>
+              <div class="ws-output" id="out0" style="margin-top:16px"><span class="placeholder">Your Suno AI-ready prompt will appear here...</span></div>
+              <div class="ws-output-actions" id="act0" style="display:none">
+                <button class="btn btn-ghost btn-xs" onclick="copyOut('out0')"><i class="fas fa-copy"></i> Copy</button>
+                <button class="btn btn-ghost btn-xs" onclick="genSuno()"><i class="fas fa-rotate"></i> Regenerate</button>
+              </div>
+            </div>
+            <!-- Tool 1: Lyrics -->
+            <div class="ws-pane" id="ws1">
+              <div class="ws-form-grid">
+                <div class="field"><label>Theme</label>
+                  <input class="inp" type="text" id="d1_theme" placeholder="e.g. night drive, underground rave, city lights">
+                </div>
+                <div class="field"><label>Style</label>
+                  <select class="inp" id="d1_style">
+                    <option value="MC chant">MC Chant with Drops</option>
+                    <option value="atmospheric spoken word">Atmospheric Spoken Word</option>
+                    <option value="aggressive hype">Aggressive Jump-Up Hype</option>
+                    <option value="liquid storytelling">Emotional Liquid Storytelling</option>
+                  </select>
+                </div>
+                <div class="field span2"><label>Language</label>
+                  <select class="inp" id="d1_lang">
+                    <option value="English">English</option>
+                    <option value="Polish">Polish</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-p btn-full" onclick="genLyrics()"><i class="fas fa-wand-magic-sparkles"></i> Generate Lyrics</button>
+              <div class="ws-output" id="out1" style="margin-top:16px"><span class="placeholder">Your DnB lyrics will appear here...</span></div>
+              <div class="ws-output-actions" id="act1" style="display:none">
+                <button class="btn btn-ghost btn-xs" onclick="copyOut('out1')"><i class="fas fa-copy"></i> Copy</button>
+                <button class="btn btn-ghost btn-xs" onclick="genLyrics()"><i class="fas fa-rotate"></i> Regenerate</button>
+              </div>
+            </div>
+            <!-- Tool 2: Mix Desc -->
+            <div class="ws-pane" id="ws2">
+              <div class="ws-form-grid">
+                <div class="field"><label>DJ / Artist Name</label>
+                  <input class="inp" type="text" id="d2_dj" placeholder="e.g. DJ MADUKI">
+                </div>
+                <div class="field"><label>Mix Title</label>
+                  <input class="inp" type="text" id="d2_title" placeholder="e.g. Neurofunk Sessions Vol.3">
+                </div>
+                <div class="field"><label>Duration</label>
+                  <select class="inp" id="d2_dur">
+                    <option value="30 minutes">30 min</option>
+                    <option value="60 minutes">60 min</option>
+                    <option value="90 minutes">90 min</option>
+                    <option value="2 hours">2 hours</option>
+                  </select>
+                </div>
+                <div class="field"><label>Platform</label>
+                  <select class="inp" id="d2_platform">
+                    <option value="SoundCloud">SoundCloud</option>
+                    <option value="Mixcloud">Mixcloud</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="Bandcamp">Bandcamp</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-p btn-full" onclick="genMixDesc()"><i class="fas fa-wand-magic-sparkles"></i> Generate Description</button>
+              <div class="ws-output" id="out2" style="margin-top:16px"><span class="placeholder">Professional mix description will appear here...</span></div>
+              <div class="ws-output-actions" id="act2" style="display:none">
+                <button class="btn btn-ghost btn-xs" onclick="copyOut('out2')"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+            </div>
+            <!-- Tool 3: Tags -->
+            <div class="ws-pane" id="ws3">
+              <div class="ws-form-grid">
+                <div class="field"><label>Genre</label>
+                  <select class="inp" id="d3_genre">
+                    <option value="neurofunk">Neurofunk</option>
+                    <option value="liquid dnb">Liquid DnB</option>
+                    <option value="jump up dnb">Jump Up</option>
+                    <option value="darkstep">Darkstep</option>
+                  </select>
+                </div>
+                <div class="field"><label>Platform</label>
+                  <select class="inp" id="d3_plat">
+                    <option value="SoundCloud">SoundCloud</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="YouTube">YouTube</option>
+                    <option value="TikTok">TikTok</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-p btn-full" onclick="genTags()"><i class="fas fa-tags"></i> Generate Tags</button>
+              <div class="ws-output" id="out3" style="margin-top:16px"><span class="placeholder">Tags & hashtags will appear here...</span></div>
+              <div class="ws-output-actions" id="act3" style="display:none">
+                <button class="btn btn-ghost btn-xs" onclick="copyOut('out3')"><i class="fas fa-copy"></i> Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing">
+    <div class="pricing-container">
+      <div class="section-header">
+        <span class="tag blue">Simple Pricing</span>
+        <h2>Start Free. Grow With Us.</h2>
+        <p>No hidden costs. Every plan includes community access, radio, and basic AI tools.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price-card">
+          <div class="price-name">Free</div>
+          <div class="price-amount"><sup>£</sup>0<span class="per">/month</span></div>
+          <div class="price-desc">Perfect for exploring the platform</div>
+          <ul class="price-features">
+            <li><i class="fas fa-check"></i>3 AI generations per day</li>
+            <li><i class="fas fa-check"></i>Public creator profile</li>
+            <li><i class="fas fa-check"></i>Community feed & XP system</li>
+            <li><i class="fas fa-check"></i>24/7 radio stream</li>
+            <li><i class="fas fa-check"></i>Global leaderboard</li>
+            <li class="dim"><i class="fas fa-minus"></i>Unlimited AI tools</li>
+            <li class="dim"><i class="fas fa-minus"></i>Analytics dashboard</li>
+            <li class="dim"><i class="fas fa-minus"></i>API access</li>
+          </ul>
+          <button class="btn btn-ghost btn-full" onclick="openModal('mRegister')">Get Started Free</button>
+        </div>
+        <div class="price-card featured">
+          <div class="price-name">Creator</div>
+          <div class="price-amount"><sup>£</sup>4.99<span class="per">/month</span></div>
+          <div class="price-desc">For active creators ready to grow</div>
+          <ul class="price-features">
+            <li><i class="fas fa-check"></i>Unlimited AI generations</li>
+            <li><i class="fas fa-check"></i>Suno Prompt Builder (all genres)</li>
+            <li><i class="fas fa-check"></i>DnB Lyric Generator EN/PL</li>
+            <li><i class="fas fa-check"></i>Mix Description Writer</li>
+            <li><i class="fas fa-check"></i>Tag & keyword generator</li>
+            <li><i class="fas fa-check"></i>Creator analytics dashboard</li>
+            <li><i class="fas fa-check"></i>Priority feed placement</li>
+            <li class="dim"><i class="fas fa-minus"></i>API access</li>
+          </ul>
+          <button class="btn btn-g btn-full" onclick="openModal('mRegister')">Start Creator Plan</button>
+        </div>
+        <div class="price-card">
+          <div class="price-name">Studio</div>
+          <div class="price-amount"><sup>£</sup>19.99<span class="per">/month</span></div>
+          <div class="price-desc">For labels, teams & power users</div>
+          <ul class="price-features">
+            <li><i class="fas fa-check"></i>Everything in Creator</li>
+            <li><i class="fas fa-check"></i>API access & integrations</li>
+            <li><i class="fas fa-check"></i>Voice Clone tool (beta)</li>
+            <li><i class="fas fa-check"></i>Team member access</li>
+            <li><i class="fas fa-check"></i>White-label prompt export</li>
+            <li><i class="fas fa-check"></i>Priority support</li>
+            <li><i class="fas fa-check"></i>Custom analytics reports</li>
+            <li><i class="fas fa-check"></i>Early feature access</li>
+          </ul>
+          <button class="btn btn-ghost btn-full" onclick="openModal('mRegister')">Start Studio Plan</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap">
+    <div class="roadmap-container">
+      <div class="section-header">
+        <span class="tag">Roadmap</span>
+        <h2>Building in Public</h2>
+        <p>Transparent development — here's exactly where we are and where we're going.</p>
+      </div>
+      <div class="rm-track">
+        <div class="rm-item done">
+          <div class="rm-dot"></div>
+          <div class="rm-status">✓ Complete</div>
+          <h3>Prototype & Auth System</h3>
+          <p>Working prototype with authentication, profiles, XP system, community feed, and AI architecture. Deployed on Google Cloud Run.</p>
+        </div>
+        <div class="rm-item done">
+          <div class="rm-dot"></div>
+          <div class="rm-status">✓ Complete</div>
+          <h3>Full Platform UI (v2)</h3>
+          <p>Production-grade front-end with research-backed dark UI, player bar, AI workspace, analytics-ready architecture. Fully responsive.</p>
+        </div>
+        <div class="rm-item next">
+          <div class="rm-dot"></div>
+          <div class="rm-status">→ Next — 2 Weeks</div>
+          <h3>Live AI Backend</h3>
+          <p>Full Anthropic API integration on dedicated Lenovo ThinkStation P720. Docker deployment, Cloudflare Tunnel, real-time prompt generation.</p>
+        </div>
+        <div class="rm-item next">
+          <div class="rm-dot"></div>
+          <div class="rm-status">→ Month 1</div>
+          <h3>Stripe Payments</h3>
+          <p>Creator (£4.99/mo) and Studio (£19.99/mo) plans go live. Unlimited AI for paid users. Real MRR begins.</p>
+        </div>
+        <div class="rm-item soon">
+          <div class="rm-dot"></div>
+          <div class="rm-status">Month 2–3</div>
+          <h3>Voice Clone Beta</h3>
+          <p>Voice cloning for MC drops and vocal chops. Beta access for Studio plan users.</p>
+        </div>
+        <div class="rm-item future">
+          <div class="rm-dot"></div>
+          <div class="rm-status">Month 4–6</div>
+          <h3>Mobile App + Global Expansion</h3>
+          <p>React Native app. UK and EU DnB label partnerships. Target: 500 paying creators, £2,500 MRR.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section id="cta-band" class="z1">
+    <span class="tag" style="margin-bottom:28px;display:inline-flex">Join the Waitlist</span>
+    <h2>Ready to Create<br><span>Without Limits?</span></h2>
+    <p>Join the first AI platform built exclusively for DnB creators. Free to start, powerful to grow. Your tools are waiting.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-g" onclick="openModal('mRegister')"><i class="fas fa-rocket"></i> Start for Free</button>
+      <button class="btn btn-ghost" onclick="toggleRadio()"><i class="fas fa-broadcast-tower"></i> Listen Live</button>
+    </div>
+    <div style="margin-top:32px; font-size:12px; color:var(--t3); font-family:'DM Mono',monospace;">
+      © 2025 BassFlow Creator Hub · Marcin A.D. Developer Solutions UK · England · All Rights Reserved
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="z1">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">BASSFLOW</div>
+        <div class="footer-copy">AI-powered tools for the global Drum and Bass creative community. Built by creators, for creators. Developed by Marcin A.D. — Developer Solutions UK.</div>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag" style="font-size:8px">Under Competition Evaluation</span>
+          <span class="tag purple" style="font-size:8px">AI-Powered</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#workspace">AI Tools</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#roadmap">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Suno AI Guide</a></li>
+          <li><a href="#">DnB Creator Blog</a></li>
+          <li><a href="#">API Documentation</a></li>
+          <li><a href="#">Community Discord</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About Marcin A.D.</a></li>
+          <li><a href="#">Developer Solutions UK</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 · BASSFLOW CREATOR HUB · MARCIN A.D. DEVELOPER SOLUTIONS UK · ENGLAND</p>
+      <div class="footer-socials">
+        <a class="social-btn" href="#"><i class="fab fa-soundcloud"></i></a>
+        <a class="social-btn" href="#"><i class="fab fa-youtube"></i></a>
+        <a class="social-btn" href="#"><i class="fab fa-instagram"></i></a>
+        <a class="social-btn" href="#"><i class="fab fa-discord"></i></a>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══════════ DASHBOARD (logged-in) ═══════════ -->
+<div id="dashboard" class="page-wrap z1">
+  <div class="dash-layout">
+    <!-- Sidebar -->
+    <aside class="dash-sidebar">
+      <div class="dash-nav-section">
+        <div class="dash-nav-label">Main</div>
+        <button class="dash-nav-item active" onclick="showDashScreen('dHome',this)"><i class="fas fa-home"></i> Dashboard</button>
+        <button class="dash-nav-item" onclick="showDashScreen('dAI',this)"><i class="fas fa-wand-magic-sparkles"></i> AI Workspace <span class="badge">4</span></button>
+        <button class="dash-nav-item" onclick="showDashScreen('dCommunity',this)"><i class="fas fa-users"></i> Community</button>
+        <button class="dash-nav-item" onclick="showDashScreen('dRadio',this)"><i class="fas fa-broadcast-tower"></i> Radio</button>
+      </div>
+      <div class="dash-nav-section">
+        <div class="dash-nav-label">Creator</div>
+        <button class="dash-nav-item" onclick="showDashScreen('dAnalytics',this)"><i class="fas fa-chart-line"></i> Analytics</button>
+        <button class="dash-nav-item" onclick="showDashScreen('dProfile',this)"><i class="fas fa-user"></i> Profile</button>
+      </div>
+      <div style="position:absolute;bottom:80px;left:0;right:0;padding:12px">
+        <button class="btn btn-ghost btn-full btn-sm" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="dash-main">
+
+      <!-- Home -->
+      <div class="dash-screen active" id="dHome">
+        <div class="dash-page-header">
+          <h2 id="dHomeTitle">Welcome back 👋</h2>
+          <p>Here's your creator overview for today</p>
+        </div>
+        <div class="stat-cards">
+          <div class="stat-card g">
+            <div class="stat-label">Total XP</div>
+            <div class="stat-val" id="statXP">0</div>
+            <div class="stat-delta up">↑ Active</div>
+          </div>
+          <div class="stat-card p">
+            <div class="stat-label">AI Generations</div>
+            <div class="stat-val">24</div>
+            <div class="stat-delta up">↑ +8 today</div>
+          </div>
+          <div class="stat-card b">
+            <div class="stat-label">Community Rank</div>
+            <div class="stat-val" id="statRank">#—</div>
+            <div class="stat-delta">Global</div>
+          </div>
+          <div class="stat-card y">
+            <div class="stat-label">Votes Received</div>
+            <div class="stat-val">47</div>
+            <div class="stat-delta up">↑ This week</div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>XP Activity — Last 7 Days</h3>
+            <span class="tag">This Week</span>
+          </div>
+          <div class="chart-bars" id="activityChart"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="lb-card">
+            <div class="lb-head"><h3>Top Creators</h3><span class="tag" style="font-size:9px">Global</span></div>
+            <div id="dashLB"></div>
+          </div>
+          <div style="background:var(--s1);border:1px solid var(--b1);border-radius:var(--r16);padding:20px">
+            <h3 style="font-size:14px;font-weight:700;margin-bottom:16px">Quick Actions</h3>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <button class="btn btn-g btn-sm btn-full" onclick="showDashScreen('dAI',null)"><i class="fas fa-wand-magic-sparkles"></i> Open AI Workspace</button>
+              <button class="btn btn-ghost btn-sm btn-full" onclick="showDashScreen('dCommunity',null)"><i class="fas fa-users"></i> Browse Community</button>
+              <button class="btn btn-ghost btn-sm btn-full" onclick="showDashScreen('dRadio',null)"><i class="fas fa-broadcast-tower"></i> Go Live Radio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Workspace (same as landing but inside dash) -->
+      <div class="dash-screen" id="dAI">
+        <div class="dash-page-header">
+          <h2>AI Workspace</h2>
+          <p>All your AI creation tools in one place</p>
+        </div>
+        <div class="ws-layout" style="margin-top:0">
+          <div class="ws-sidebar">
+            <button class="ws-tool-btn active" onclick="switchDashTool(0,this)">
+              <div class="ws-tool-icon"><i class="fas fa-pen-nib"></i></div>
+              <div class="ws-tool-info"><strong>Suno Prompt Builder</strong><small>v4 / v4.5 ready</small></div>
+            </button>
+            <button class="ws-tool-btn" onclick="switchDashTool(1,this)">
+              <div class="ws-tool-icon"><i class="fas fa-music"></i></div>
+              <div class="ws-tool-info"><strong>Lyric Generator</strong><small>EN / PL</small></div>
+            </button>
+            <button class="ws-tool-btn" onclick="switchDashTool(2,this)">
+              <div class="ws-tool-icon"><i class="fas fa-file-lines"></i></div>
+              <div class="ws-tool-info"><strong>Mix Description</strong><small>SoundCloud ready</small></div>
+            </button>
+            <button class="ws-tool-btn" onclick="switchDashTool(3,this)">
+              <div class="ws-tool-icon"><i class="fas fa-tags"></i></div>
+              <div class="ws-tool-info"><strong>Tag Generator</strong><small>All platforms</small></div>
+            </button>
+          </div>
+          <div class="ws-main">
+            <div class="ws-header">
+              <div class="ws-header-info">
+                <h3 id="dashWsTitle">Suno Prompt Builder</h3>
+                <p id="dashWsDesc">Generate production-ready Suno prompts</p>
+              </div>
+              <span class="tag purple">Logged In — Unlimited</span>
+            </div>
+            <div class="ws-body">
+              <div class="ws-pane active" id="dws0">
+                <div class="ws-form-grid">
+                  <div class="field"><label>Genre</label><select class="inp" id="dd0_genre"><option value="neurofunk">Neurofunk</option><option value="liquid">Liquid DnB</option><option value="jump-up">Jump Up</option><option value="darkstep">Darkstep</option></select></div>
+                  <div class="field"><label>Mood</label><select class="inp" id="dd0_mood"><option value="dark and intense">Dark & Intense</option><option value="euphoric">Euphoric</option><option value="cinematic">Cinematic</option></select></div>
+                  <div class="field"><label>BPM</label><select class="inp" id="dd0_bpm"><option value="174">174 BPM</option><option value="170">170 BPM</option><option value="176">176 BPM</option></select></div>
+                  <div class="field"><label>Language</label><select class="inp" id="dd0_lang"><option value="English">English</option><option value="Polish">Polish</option><option value="Instrumental">Instrumental</option></select></div>
+                  <div class="field span2"><label>Extra notes</label><input class="inp" type="text" id="dd0_extra" placeholder="e.g. heavy reese, rolling amen, choir..."></div>
+                </div>
+                <button class="btn btn-p btn-full" onclick="genSunoDash()"><i class="fas fa-wand-magic-sparkles"></i> Generate</button>
+                <div class="ws-output" id="dout0" style="margin-top:16px"><span class="placeholder">Output appears here...</span></div>
+                <div class="ws-output-actions" id="dact0" style="display:none"><button class="btn btn-ghost btn-xs" onclick="copyOut('dout0')"><i class="fas fa-copy"></i> Copy</button></div>
+              </div>
+              <div class="ws-pane" id="dws1">
+                <div class="ws-form-grid">
+                  <div class="field"><label>Theme</label><input class="inp" type="text" id="dd1_theme" placeholder="night drive, underground..."></div>
+                  <div class="field"><label>Style</label><select class="inp" id="dd1_style"><option>MC Chant</option><option>Atmospheric</option><option>Aggressive Hype</option></select></div>
+                  <div class="field span2"><label>Language</label><select class="inp" id="dd1_lang"><option value="English">English</option><option value="Polish">Polish</option></select></div>
+                </div>
+                <button class="btn btn-p btn-full" onclick="genLyricsDash()"><i class="fas fa-wand-magic-sparkles"></i> Generate</button>
+                <div class="ws-output" id="dout1" style="margin-top:16px"><span class="placeholder">Lyrics appear here...</span></div>
+                <div class="ws-output-actions" id="dact1" style="display:none"><button class="btn btn-ghost btn-xs" onclick="copyOut('dout1')"><i class="fas fa-copy"></i> Copy</button></div>
+              </div>
+              <div class="ws-pane" id="dws2">
+                <div class="ws-form-grid">
+                  <div class="field"><label>DJ Name</label><input class="inp" type="text" id="dd2_dj" placeholder="DJ MADUKI"></div>
+                  <div class="field"><label>Mix Title</label><input class="inp" type="text" id="dd2_title" placeholder="Sessions Vol.1"></div>
+                  <div class="field"><label>Duration</label><select class="inp" id="dd2_dur"><option value="60 minutes">60 min</option><option value="90 minutes">90 min</option><option value="2 hours">2 hours</option></select></div>
+                  <div class="field"><label>Platform</label><select class="inp" id="dd2_plat"><option>SoundCloud</option><option>YouTube</option><option>Mixcloud</option></select></div>
+                </div>
+                <button class="btn btn-p btn-full" onclick="genMixDescDash()"><i class="fas fa-wand-magic-sparkles"></i> Generate</button>
+                <div class="ws-output" id="dout2" style="margin-top:16px"><span class="placeholder">Description appears here...</span></div>
+                <div class="ws-output-actions" id="dact2" style="display:none"><button class="btn btn-ghost btn-xs" onclick="copyOut('dout2')"><i class="fas fa-copy"></i> Copy</button></div>
+              </div>
+              <div class="ws-pane" id="dws3">
+                <div class="ws-form-grid">
+                  <div class="field"><label>Genre</label><select class="inp" id="dd3_genre"><option value="neurofunk">Neurofunk</option><option value="liquid dnb">Liquid DnB</option><option value="jump up">Jump Up</option></select></div>
+                  <div class="field"><label>Platform</label><select class="inp" id="dd3_plat"><option>SoundCloud</option><option>Instagram</option><option>YouTube</option></select></div>
+                </div>
+                <button class="btn btn-p btn-full" onclick="genTagsDash()"><i class="fas fa-tags"></i> Generate Tags</button>
+                <div class="ws-output" id="dout3" style="margin-top:16px"><span class="placeholder">Tags appear here...</span></div>
+                <div class="ws-output-actions" id="dact3" style="display:none"><button class="btn btn-ghost btn-xs" onclick="copyOut('dout3')"><i class="fas fa-copy"></i> Copy</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community -->
+      <div class="dash-screen" id="dCommunity">
+        <div class="dash-page-header">
+          <h2>Community</h2>
+          <p>Discover and support fellow DnB creators</p>
+        </div>
+        <div class="feed-grid" id="communityFeed"></div>
+      </div>
+
+      <!-- Radio -->
+      <div class="dash-screen" id="dRadio">
+        <div class="dash-page-header"><h2>Live Radio</h2><p>BassFlow 24/7 stream</p></div>
+        <div style="text-align:center;padding:60px 20px">
+          <div style="width:160px;height:160px;border-radius:50%;background:conic-gradient(var(--p),var(--g),var(--b),var(--p));margin:0 auto 24px;display:flex;align-items:center;justify-content:center;position:relative" id="radioDisc">
+            <div style="width:60px;height:60px;border-radius:50%;background:var(--s1);position:absolute"></div>
+          </div>
+          <h2 style="margin-bottom:8px">BassFlow Main Stream</h2>
+          <p style="color:var(--t3);margin-bottom:28px">Drum and Bass · Neurofunk · Liquid · 24/7</p>
+          <button class="btn btn-g" style="margin:0 auto" onclick="toggleRadio()"><i class="fas fa-play" id="radioIcon"></i> Play Stream</button>
+        </div>
+      </div>
+
+      <!-- Analytics -->
+      <div class="dash-screen" id="dAnalytics">
+        <div class="dash-page-header"><h2>Analytics</h2><p>Your creator performance data</p></div>
+        <div class="stat-cards" style="margin-bottom:20px">
+          <div class="stat-card g"><div class="stat-label">Total XP</div><div class="stat-val" id="aStatXP">0</div><div class="stat-delta up">Your score</div></div>
+          <div class="stat-card p"><div class="stat-label">Tools Used</div><div class="stat-val">24</div><div class="stat-delta">AI generations</div></div>
+          <div class="stat-card b"><div class="stat-label">Votes Given</div><div class="stat-val">12</div><div class="stat-delta up">Community</div></div>
+          <div class="stat-card y"><div class="stat-label">Votes Received</div><div class="stat-val">47</div><div class="stat-delta up">This month</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header"><h3>Monthly XP Growth</h3><span class="tag">30 days</span></div>
+          <div class="chart-bars" id="analyticsChart"></div>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div class="dash-screen" id="dProfile">
+        <div class="dash-page-header"><h2>Profile</h2><p>Manage your creator identity</p></div>
+        <div class="profile-banner">
+          <div class="profile-big-av" id="profAvatar">?</div>
+          <div class="profile-meta">
+            <h2 id="profName">Loading...</h2>
+            <div class="profile-xp" id="profXP">0 XP</div>
+            <div style="margin-top:8px" id="profRoleTag"></div>
+          </div>
+        </div>
+        <div class="profile-form">
+          <h3>Edit Profile</h3>
+          <div class="ws-form-grid">
+            <div class="field"><label>Artist Name</label><input class="inp" type="text" id="editName"></div>
+            <div class="field"><label>Creator Type</label><select class="inp" id="editRole"><option value="real_dj">🎧 Real DJ</option><option value="ai_creator">🤖 AI Creator</option></select></div>
+            <div class="field span2"><label>Bio</label><input class="inp" type="text" id="editBio" placeholder="Short description..."></div>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-g" onclick="saveProfile()"><i class="fas fa-save"></i> Save Changes</button>
+            <button class="btn btn-ghost" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════ PLAYER ═══════════ -->
+<div id="player" role="complementary" aria-label="Audio Player">
+  <div class="player-thumb">🎵</div>
+  <div class="player-info" style="min-width:140px">
+    <div class="player-title" id="pTitle">BassFlow Radio — Live</div>
+    <div class="player-sub">Drum and Bass · 24/7</div>
+  </div>
+  <div class="player-ctrl">
+    <button class="pc"><i class="fas fa-backward-step"></i></button>
+    <button class="pc-main" id="pBtn" onclick="toggleRadio()"><i class="fas fa-play" id="pIcon"></i></button>
+    <button class="pc"><i class="fas fa-forward-step"></i></button>
+  </div>
+  <div class="player-progress">
+    <span class="prog-time">LIVE</span>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+  <div class="live-chip"><div class="live-dot"></div> LIVE</div>
+  <div class="vol-wrap">
+    <i class="fas fa-volume-medium"></i>
+    <input type="range" class="vol-range" value="75" min="0" max="100">
+  </div>
+</div>
+
+<!-- ═══════════ JAVASCRIPT ═══════════ -->
+<script>
+/* ─── DB ─── */
+const DBKEY = 'bf_v4';
+if (!localStorage.getItem(DBKEY)) {
+  localStorage.setItem(DBKEY, JSON.stringify({
+    users: [
+      { id:1, email:'demo@bassflow.com', pass:'demo123', name:'DJ Prototype', role:'real_dj', bio:'Heavy bass lover from London.', xp:5500 },
+      { id:2, email:'ai@bassflow.com',   pass:'demo123', name:'NeuralNet-01', role:'ai_creator', bio:'Algorithm-generated hits only.', xp:1200 },
+      { id:3, email:'maduki@bassflow.com', pass:'demo123', name:'DJ MADUKI', role:'real_dj', bio:'Neurofunk & liquid DnB from the UK. DJ / Producer / Developer.', xp:8800 },
+      { id:4, email:'liq@bassflow.com', pass:'demo123', name:'LiquidSoul', role:'real_dj', bio:'Liquid vibes, smooth drops.', xp:3400 },
+      { id:5, email:'neuro@bassflow.com', pass:'demo123', name:'NR-7', role:'ai_creator', bio:'Pure neurofunk from the machine.', xp:2100 },
+    ],
+    currentUser: null
+  }));
+}
+let DB = JSON.parse(localStorage.getItem(DBKEY));
+const save = () => localStorage.setItem(DBKEY, JSON.stringify(DB));
+
+/* ─── TOAST ─── */
+function toast(msg, type='') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`; t.innerHTML = msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+/* ─── MODAL ─── */
+function openModal(id) {
+  document.querySelectorAll('.modal-ov').forEach(m=>m.classList.remove('open'));
+  document.getElementById(id).classList.add('open');
+}
+function closeModals() { document.querySelectorAll('.modal-ov').forEach(m=>m.classList.remove('open')); }
+document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModals();}));
+
+/* ─── AUTH ─── */
+function doLogin() {
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPass').value;
+  const u=DB.users.find(x=>x.email===email&&x.pass===pass);
+  if(u){DB.currentUser=u;save();closeModals();updateUI();showDashboard();toast(`👋 Welcome back, <strong>${u.name}</strong>!`);}
+  else{document.getElementById('loginErr').innerText='Incorrect email or password.';}
+}
+function doRegister() {
+  const name=document.getElementById('rName').value.trim();
+  const email=document.getElementById('rEmail').value.trim();
+  const pass=document.getElementById('rPass').value;
+  const role=document.getElementById('rRole').value;
+  const err=document.getElementById('regErr');
+  if(!name||!email||!pass){err.innerText='Please fill all fields.';return;}
+  if(pass.length<6){err.innerText='Password too short.';return;}
+  if(DB.users.find(x=>x.email===email)){err.innerText='Email already registered.';return;}
+  const u={id:Date.now(),email,pass,name,role,bio:'',xp:100};
+  DB.users.push(u);DB.currentUser=u;save();
+  closeModals();updateUI();showDashboard();
+  toast(`🚀 Welcome to BassFlow, <strong>${name}</strong>! +100 XP to start.`,'xp');
+}
+function doLogout(){DB.currentUser=null;save();updateUI();showLanding();toast('👋 Signed out.');}
+
+/* ─── VIEWS ─── */
+function showDashboard() {
+  document.getElementById('landing').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('navLinks').style.display='none';
+  updateDashboard();
+}
+function showLanding() {
+  document.getElementById('landing').style.display='block';
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('navLinks').style.display='flex';
+}
+
+/* ─── NAV ─── */
+function updateUI() {
+  const u=DB.currentUser;
+  const r=document.getElementById('navRight');
+  if(u){
+    const col=u.role==='real_dj'?'var(--g)':'var(--p)';
+    r.innerHTML=`
+      <div class="nav-xp">${u.xp.toLocaleString()} XP</div>
+      <div class="nav-av" style="background:${col}18;color:${col};border:1px solid ${col}40" onclick="showDashboard()" title="${u.name}">${u.name.charAt(0)}</div>`;
+  } else {
+    r.innerHTML=`
+      <button class="btn btn-ghost btn-sm" onclick="openModal('mLogin')">Sign In</button>
+      <button class="btn btn-g btn-sm" onclick="openModal('mRegister')">Start Free</button>`;
+  }
+}
+function smoothNav(el,sel) {
+  document.querySelectorAll('.nav-link').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelector(sel)?.scrollIntoView({behavior:'smooth'});
+  return false;
+}
+
+/* ─── DASHBOARD ─── */
+function updateDashboard() {
+  const u=DB.currentUser; if(!u) return;
+  const col=u.role==='real_dj'?'var(--g)':'var(--p)';
+  document.getElementById('dHomeTitle').innerText=`Welcome back, ${u.name} 👋`;
+  document.getElementById('statXP').innerText=u.xp.toLocaleString();
+  document.getElementById('aStatXP').innerText=u.xp.toLocaleString();
+  const sorted=[...DB.users].sort((a,b)=>b.xp-a.xp);
+  const rank=sorted.findIndex(x=>x.id===u.id)+1;
+  document.getElementById('statRank').innerText='#'+rank;
+  // Profile
+  document.getElementById('profName').innerText=u.name;
+  document.getElementById('profXP').innerText=u.xp.toLocaleString()+' XP';
+  document.getElementById('profAvatar').innerText=u.name.charAt(0);
+  document.getElementById('profAvatar').style.cssText=`background:${col}18;color:${col};border:3px solid ${col}40`;
+  document.getElementById('profRoleTag').innerHTML=`<span class="tag ${u.role==='real_dj'?'':'purple'}" style="font-size:10px">${u.role==='real_dj'?'🎧 Real DJ':'🤖 AI Creator'}</span>`;
+  document.getElementById('editName').value=u.name;
+  document.getElementById('editRole').value=u.role;
+  document.getElementById('editBio').value=u.bio||'';
+  renderLeaderboard();
+  renderFeed();
+  renderCharts();
+}
+function showDashScreen(id,el) {
+  document.querySelectorAll('.dash-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.dash-nav-item').forEach(b=>b.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else { document.querySelectorAll('.dash-nav-item').forEach(b=>{ if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes(id)) b.classList.add('active'); }); }
+}
+function renderLeaderboard() {
+  const sorted=[...DB.users].sort((a,b)=>b.xp-a.xp).slice(0,5);
+  const ranks=['g1','g2','g3','',''];
+  document.getElementById('dashLB').innerHTML=sorted.map((u,i)=>{
+    const col=u.role==='real_dj'?'var(--g)':'var(--p)';
+    const isMe=DB.currentUser&&DB.currentUser.id===u.id;
+    return `<div class="lb-row"${isMe?' style="background:rgba(0,255,157,.04)"':''}>
+      <div class="lb-rank ${ranks[i]}">#${i+1}</div>
+      <div class="lb-av" style="background:${col}18;color:${col}">${u.name.charAt(0)}</div>
+      <div class="lb-info"><strong>${u.name}${isMe?' <small style="color:var(--g)">(you)</small>':''}</strong><small>${u.role==='real_dj'?'Real DJ':'AI Creator'}</small></div>
+      <div class="lb-xp" style="color:${col}">${u.xp.toLocaleString()}</div>
+      ${DB.currentUser&&!isMe?`<button class="btn btn-ghost btn-xs" onclick="voteUser(${u.id})" style="margin-left:8px"><i class="fas fa-heart"></i></button>`:''}
+    </div>`;
+  }).join('');
+}
+function renderFeed() {
+  const others=DB.users.filter(u=>u.id!==(DB.currentUser?.id??null));
+  document.getElementById('communityFeed').innerHTML=others.map(u=>{
+    const col=u.role==='real_dj'?'var(--g)':'var(--p)';
+    return `<div class="feed-card">
+      <div class="feed-av" style="background:${col}18;color:${col}">${u.name.charAt(0)}</div>
+      <div class="feed-info">
+        <strong>${u.name}</strong>
+        <span class="role-tag" style="color:${col}">${u.role==='real_dj'?'Real DJ':'AI Creator'}</span>
+        <div class="feed-bio">${u.bio||'No bio yet.'}</div>
+        <div class="feed-actions">
+          <button class="btn btn-ghost btn-xs" onclick="voteUser(${u.id})"><i class="fas fa-heart"></i> Vote +10 XP</button>
+          <button class="btn btn-ghost btn-xs" onclick="toast('▶ Loading set...')"><i class="fas fa-play"></i> Listen</button>
+        </div>
+      </div>
+      <div class="feed-xp" style="color:${col}">${u.xp.toLocaleString()} XP</div>
+    </div>`;
+  }).join('');
+}
+function renderCharts() {
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const vals=[45,72,38,90,56,88,65];
+  const maxV=Math.max(...vals);
+  ['activityChart','analyticsChart'].forEach(id=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML=days.map((d,i)=>`
+      <div class="chart-bar-wrap">
+        <div class="chart-bar${i%2?' p':''}" style="height:${Math.round(vals[i]/maxV*90)}px"></div>
+        <div class="chart-day">${d}</div>
+      </div>`).join('');
+  });
+}
+function saveProfile() {
+  if(!DB.currentUser) return;
+  const idx=DB.users.findIndex(u=>u.id===DB.currentUser.id);
+  const upd={...DB.currentUser,name:document.getElementById('editName').value,role:document.getElementById('editRole').value,bio:document.getElementById('editBio').value};
+  DB.currentUser=upd; DB.users[idx]=upd; save(); updateUI(); updateDashboard();
+  toast('✅ Profile updated!');
+}
+function voteUser(id) {
+  if(!DB.currentUser){openModal('mLogin');return;}
+  const idx=DB.users.findIndex(u=>u.id===id);
+  if(idx!==-1) DB.users[idx].xp+=10;
+  DB.currentUser.xp+=5;
+  const ci=DB.users.findIndex(u=>u.id===DB.currentUser.id);
+  DB.users[ci].xp=DB.currentUser.xp;
+  save(); updateUI(); updateDashboard();
+  toast('❤️ Vote cast! <strong>+5 XP</strong> for you.','xp');
+}
+
+/* ─── AI TOOLS ─── */
+const wsTitles=['Suno Prompt Builder','Lyric Generator','Mix Description','Tag Generator'];
+const wsDescs=['Generate Suno AI v4/v4.5 ready prompts','Create DnB lyrics in EN or Polish','Professional mix copy for all platforms','Hashtags & keywords for every platform'];
+function switchWsTool(i,el){
+  document.querySelectorAll('#workspace .ws-tool-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#workspace .ws-pane').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('ws'+i).classList.add('active');
+  document.getElementById('wsTitle').innerText=wsTitles[i];
+  document.getElementById('wsDesc').innerText=wsDescs[i];
+}
+function switchDashTool(i,el){
+  document.querySelectorAll('#dAI .ws-tool-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#dAI .ws-pane').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('dws'+i).classList.add('active');
+  document.getElementById('dashWsTitle').innerText=wsTitles[i];
+  document.getElementById('dashWsDesc').innerText=wsDescs[i];
+}
+function setOut(id,actId,content){
+  document.getElementById(id).innerHTML=content;
+  if(actId) document.getElementById(actId).style.display='flex';
+  if(DB.currentUser){DB.currentUser.xp+=15;const ci=DB.users.findIndex(u=>u.id===DB.currentUser.id);DB.users[ci].xp=DB.currentUser.xp;save();updateUI();if(document.getElementById('dashboard').style.display!=='none')updateDashboard();toast('+15 XP earned!','xp');}
+}
+function copyOut(id){const t=document.getElementById(id).innerText;navigator.clipboard?.writeText(t);toast('📋 Copied to clipboard!');}
+function showGen(id){document.getElementById(id).innerHTML=`<div class="ws-generating"><div class="gen-dots"><span></span><span></span><span></span></div> Generating with AI...</div>`;}
+
+function genSuno(){
+  const g=document.getElementById('d0_genre').value,m=document.getElementById('d0_mood').value,b=document.getElementById('d0_bpm').value,l=document.getElementById('d0_lang').value,ex=document.getElementById('d0_extra').value;
+  showGen('out0');
+  setTimeout(()=>{
+    const map={neurofunk:`[neurofunk dnb] [${b} bpm] [${m}] [${l} vocals]\nStyle: dark neurofunk, complex reese basslines, technical amen chopping, industrial textures, cinematic atmosphere${ex?', '+ex:''}\n\n[Intro]\n(tense atmospheric build, sub-bass rumble, hi-hat static)\n\n[Drop 1]\nRAW REESE DEVASTATION — bass mutations cascade\nTECHNICAL PRECISION — amen surgery in motion\n(rolling neurofunk groove, heavy sub pressure)\n\n[Breakdown]\n(atmospheric synth pad, tension rebuild, filtered bass)\n\n[Drop 2]\nFULL PRESSURE — maximum neurofunk complexity\n(layer reese over rolling drums)\n\n[Outro]\n(bass decay, reverb tail, fade to static)`,liquid:`[liquid dnb] [${b} bpm] [${m}] [${l} vocals]\nStyle: lush liquid drumfunk, organic pads, warm soulful basslines, rolling breaks, emotional chord progressions, smooth transitions${ex?', '+ex:''}\n\n[Intro]\n(gentle pad swell, organic texture build)\n\n[Verse]\nSmooth rolling percussion carries the weight\nWarm liquid bass pulses like heartbeat\n(melodic lead arpeggio over lush pads)\n\n[Chorus]\nEUPHORIC LIFT — harmonic peak ascension\n(choir layer, full spectrum)\n\n[Outro]\n(warm chord resolution, reverb tails)`,default:`[${g} dnb] [${b} bpm] [${m}] [${l} vocals]\nStyle: classic dnb energy, punchy kicks, snappy snares, driving bassline, peak-time energy${ex?', '+ex:''}\n\n[Intro]\n(bass rumble build)\n\n[Drop]\nPEAK ENERGY — maximum impact\n(hard-hitting percussion groove)\n\n[Break]\n(tension and release)\n\n[2nd Drop]\nFULL FORCE — crowd momentum\n\n[Outro]\n(energy fade, reverb)`};
+    setOut('out0','act0',map[g]||map.default);
+  },1300);
+}
+function genLyrics(){
+  const t=document.getElementById('d1_theme').value||'the underground';
+  const s=document.getElementById('d1_style').value;
+  const l=document.getElementById('d1_lang').value;
+  showGen('out1');
+  setTimeout(()=>{
+    const en=`[${s}]\n\n[Verse 1]\nDeep in the shadows where the bass lines breathe\nUnderground currents and the rhythms we weave\nEvery drop a declaration, every beat a truth\nThis is ${t} — raw, real, uncut proof\n\n[Pre-Drop]\nFEEL IT BUILDING — pressure rising\nCAN'T CONTAIN IT — (bass is climbing)\n\n[DROP / Chorus]\nWE RIDE THE BASS WAVE — no surrender\nNIGHT NEVER FADES when we remember\n(rolling percussion, sub pressure)\nUNDERGROUND IS ETERNAL — forever\n\n[Verse 2]\nNeon reflections on the rain-soaked floor\nEvery MC calling for one more\nThe reese bass speaks what words can't say\nThis is ${t} — and we're here to stay\n\n[Outro]\n(fade to bass frequency...)`;
+    const pl=`[${s}]\n\n[Zwrotka 1]\nGłęboko w cieniu gdzie bas oddycha\nPodziemne prądy i rytm nas wyciąga\nKażdy drop to deklaracja, każdy bit to prawda\nTo jest ${t} — surowe, realne, bez maski\n\n[Pre-Drop]\nCZUJ JAK ROŚNIE — ciśnienie wzrasta\nNIE ZATRZYMASZ — (bas się wspina)\n\n[Drop / Refren]\nJEDZIEMY NA BASU — bez poddania\nNOC NIGDY NIE GAŚNIE gdy pamiętamy\n(tocząca perkusja)\nPODZIEMIE JEST WIECZNE — na zawsze\n\n[Zwrotka 2]\nNeonowe refleksy na mokrej posadzce\nKażdy MC woła o encore\nBas mówi to czego słowa nie mogą\nTo jest ${t} — i tu zostajemy`;
+    setOut('out1','act1',l==='Polish'?pl:en);
+  },1400);
+}
+function genMixDesc(){
+  const dj=document.getElementById('d2_dj').value||'DJ';
+  const mix=document.getElementById('d2_title').value||'DnB Mix';
+  const dur=document.getElementById('d2_dur').value;
+  const plat=document.getElementById('d2_platform').value;
+  showGen('out2');
+  setTimeout(()=>{
+    setOut('out2','act2',`${mix} by ${dj} — ${dur} of underground energy.\n\nThis ${dur} session showcases ${dj}'s signature blend of neurofunk precision and atmospheric depth. From the opening bars, heavy reese basslines and intricate amen arrangements establish unrelenting momentum that carries through to the final beat.\n\nFeaturing carefully curated tracks from both established and underground talent, this set demonstrates mature energy management — building tension through technical steppers before releasing into euphoric passages.\n\nRecorded and mixed at BassFlow Creator Hub.\n\n🎧 Tracklist in comments\n📡 Follow ${dj} on BassFlow Creator Hub\n🔊 ${plat} exclusive\n\n#DrumAndBass #Neurofunk #DnB #Underground #${dj.replace(/\s/g,'').replace('DJ','DJ')} #BassFlow`);
+  },1300);
+}
+function genTags(){
+  const g=document.getElementById('d3_genre').value;
+  const p=document.getElementById('d3_plat').value;
+  showGen('out3');
+  setTimeout(()=>{
+    const tags={soundcloud:`Tags: drum and bass, ${g}, dnb, underground, bass music, uk dnb, rave, electronic\n\nHashtags:\n#DrumAndBass #${g.replace(/\s/g,'')} #DnB #Underground #BassMusicUK #Rave #Electronic #UKScene #NightLife #BassFlow`,instagram:`#DrumAndBass #${g.charAt(0).toUpperCase()+g.slice(1).replace(/\s/g,'')} #DnB #Underground #BassMusicUK #Rave #DJLife #ProducerLife #BassHead #NeurofunkNation #LiquidDnB #UKMusic #BassFlow #CreatorHub`,youtube:`Title keywords: ${g} mix 2025, drum and bass, best dnb, underground electronic\n\nDescription tags: #DrumAndBass #${g.replace(/\s/g,'')} #DnBMix2025 #Underground #BassMusicUK #BassFlow`,tiktok:`#dnb #drumbass #${g.replace(/\s/g,'')} #bass #underground #raveculture #basshead #ukmusic #electronicmusic #bassflow #fyp #fypシ`};
+    setOut('out3','act3',tags[p.toLowerCase()]||tags.soundcloud);
+  },1000);
+}
+// Dash versions
+function genSunoDash(){const g=document.getElementById('dd0_genre').value,m=document.getElementById('dd0_mood').value,b=document.getElementById('dd0_bpm').value,l=document.getElementById('dd0_lang').value;showGen('dout0');setTimeout(()=>setOut('dout0','dact0',`[${g} dnb] [${b} bpm] [${m}] [${l} vocals]\nStyle: authentic ${g}, powerful basslines, expert mixing, peak-time energy, crowd momentum\n\n[Intro]\n(atmospheric bass build)\n\n[Drop]\nFULL ${g.toUpperCase()} POWER — total immersion\n(rhythmic groove, bass pressure)\n\n[Break]\n(tension and release cycle)\n\n[Final Drop]\nMAXIMUM ENERGY — pure ${g}\n\n[Outro]\n(fade, reverb tails)`),1200);}
+function genLyricsDash(){const t=document.getElementById('dd1_theme').value||'the underground',l=document.getElementById('dd1_lang').value;showGen('dout1');setTimeout(()=>setOut('dout1','dact1',l==='Polish'?`[MC Chant]\n\nTo jest ${t} — czujesz to\nBas uderza w klatę — nie uciekniesz\nWszyscy tu razem — podziemie żyje\nRhythm nas unosi — wieczna energia`:
+`[MC Chant]\n\nThis is ${t} — feel it\nBass hits the chest — you can't escape it\nAll together now — the underground lives\nRhythm lifts us — eternal energy`),1200);}
+function genMixDescDash(){const dj=document.getElementById('dd2_dj').value||'DJ MADUKI',mix=document.getElementById('dd2_title').value||'Sessions Vol.1',dur=document.getElementById('dd2_dur').value,plat=document.getElementById('dd2_plat').value;showGen('dout2');setTimeout(()=>setOut('dout2','dact2',`${mix} by ${dj} — ${dur} of pure underground energy.\n\nA masterful journey through dark neurofunk corridors and euphoric liquid passages. ${dj} delivers peak-time DJ craft with precision-selected tracks and seamless mixing.\n\n🎧 Available on ${plat}\n#DrumAndBass #Neurofunk #BassFlow`),1200);}
+function genTagsDash(){const g=document.getElementById('dd3_genre').value,p=document.getElementById('dd3_plat').value;showGen('dout3');setTimeout(()=>setOut('dout3','dact3',`#DrumAndBass #${g.replace(/\s/g,'')} #DnB #Underground #BassFlow #${p} #BassMusicUK #Rave #Electronic`),900);}
+
+/* ─── RADIO ─── */
+let playing=false, progInt=null, progV=0;
+function toggleRadio(){
+  playing=!playing;
+  ['pIcon','radioIcon'].forEach(id=>{const el=document.getElementById(id);if(el)el.className=playing?'fas fa-pause':'fas fa-play';});
+  const disc=document.getElementById('radioDisc');
+  if(disc) disc.style.animation=playing?'spin 4s linear infinite':'none';
+  if(playing){
+    toast('📻 BassFlow Radio — Live Stream!');
+    progInt=setInterval(()=>{progV=(progV+0.4)%100;document.getElementById('progFill').style.width=progV+'%';},300);
+  } else { clearInterval(progInt); }
+}
+
+/* ─── SCROLL NAV ─── */
+window.addEventListener('scroll',()=>{
+  if(document.getElementById('landing').style.display==='none') return;
+  const secs=['features','workspace','pricing','roadmap'];
+  let active='';
+  secs.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-80)active=id;});
+  document.querySelectorAll('.nav-link').forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+active);});
+});
+
+// Spin animation
+const ss=document.createElement('style');
+ss.textContent='@keyframes spin{100%{transform:rotate(360deg)}}';
+document.head.appendChild(ss);
+
+/* ─── INIT ─── */
+updateUI();
+if(DB.currentUser){showDashboard();}
+</script>
+</body>
+</html>
