@@ -1,48 +1,154 @@
-# Bass Flow 🎵
+# 🎛️ BassWave
 
-> The one-stop platform for DJs and Drum & Bass music lovers.
+Platforma społecznościowa dla Drum & Bass — upload, odkrywaj, komentuj.
 
-## Overview
+## Stack
 
-**Bass Flow** is a single-page web platform built for the Drum & Bass community — DJs, music fans, and event organisers alike. Everything you need is in one place:
+| Warstwa | Technologia |
+|---------|-------------|
+| Frontend | React 18 + Vite + TypeScript |
+| State | Zustand (player + auth) |
+| Data fetching | TanStack Query |
+| Backend | Node.js + Express + TypeScript |
+| Baza danych | PostgreSQL via Prisma ORM |
+| Storage | Supabase Storage (audio + covers) |
+| Auth | Supabase Auth + JWT |
+| Hosting | Google Cloud Run |
 
-| Feature | Description |
-|---|---|
-| 🎵 **Track Browsing** | Explore 50K+ DnB tracks filtered by sub-genre (Liquid, Neuro, Jump Up, Techstep, Jungle) |
-| ▶ **In-browser Player** | Persistent player bar with play/pause, skip, progress scrubbing, and volume control |
-| 🎧 **DJ Profiles** | Follow your favourite DJs and discover new talent |
-| 📅 **Events** | Browse upcoming Drum & Bass events worldwide and grab tickets |
-| 📼 **Mixes** | Full-length DJ sets available to stream |
-| ⬆ **DJ Upload** | DJs can upload their own mixes directly to the platform |
+---
 
-## Running locally
+## 🚀 Szybki start (lokalne dev)
 
-No build step required — open `index.html` directly in any modern browser:
+### 1. Supabase (5 minut, bezpłatnie)
+
+1. Wejdź na [supabase.com](https://supabase.com) → **New project**
+2. Skopiuj z **Settings → Database → Connection string** → `DATABASE_URL` i `DIRECT_URL`
+3. Skopiuj z **Settings → API** → `SUPABASE_URL` i `service_role` key
+4. W **Storage** utwórz 2 buckety:
+   - `tracks-audio` (Public: ✅)
+   - `tracks-covers` (Public: ✅)
+
+### 2. Konfiguracja środowiska
 
 ```bash
-# Option 1 — just open the file
-open index.html
-
-# Option 2 — serve with any static server, e.g. Python
-python3 -m http.server 8080
-# then visit http://localhost:8080
+cp apps/api/.env.example apps/api/.env
+# Uzupełnij DATABASE_URL, DIRECT_URL, SUPABASE_URL, SUPABASE_SERVICE_KEY, JWT_SECRET
 ```
 
-## Project structure
-
-```
-Bass-flow-/
-├── index.html        # Single-page application entry point
-├── css/
-│   └── styles.css    # Dark DJ aesthetic with neon accents
-├── js/
-│   └── app.js        # Visualizer, player, data & interactive UI
-└── README.md
+Wygeneruj JWT_SECRET:
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
-## Tech stack
+### 3. Instalacja i migracja DB
 
-- **HTML5** — semantic markup
-- **CSS3** — custom properties, grid/flexbox, animations
-- **Vanilla JavaScript** — no frameworks or build tools needed
+```bash
+npm install
+npm run db:migrate        # tworzy tabele
+npm run db:seed -w apps/api   # opcjonalnie – sample data
+```
 
+### 4. Uruchom
+
+```bash
+npm run dev               # API :3001 + Web :5173 równocześnie
+# lub oddzielnie:
+npm run dev:api
+npm run dev:web
+```
+
+Otwórz: http://localhost:5173
+
+---
+
+## 🐳 Docker (lokalny pełny stack)
+
+```bash
+cp apps/api/.env.example .env   # uzupełnij zmienne Supabase
+docker-compose up --build
+```
+
+Web: http://localhost:8080 | API: http://localhost:3001
+
+---
+
+## ☁️ Deploy na Google Cloud Run
+
+```bash
+chmod +x deploy.sh
+
+# Eksportuj zmienne
+export DATABASE_URL="..."
+export DIRECT_URL="..."
+export SUPABASE_URL="..."
+export SUPABASE_SERVICE_KEY="..."
+export JWT_SECRET="..."
+
+# Deploy API + Web
+./deploy.sh all
+
+# Lub oddzielnie
+./deploy.sh api
+./deploy.sh web
+```
+
+Projekt GCP: `gen-lang-client-0354485869` | Region: `europe-west1`
+
+---
+
+## 📁 Struktura projektu
+
+```
+basswave/
+├── apps/
+│   ├── api/                    Node.js + Express API
+│   │   ├── prisma/schema.prisma   Modele DB
+│   │   └── src/
+│   │       ├── routes/            auth / tracks / users / uploads
+│   │       ├── middleware/        JWT auth + error handler
+│   │       └── lib/               Prisma + Supabase klienty
+│   └── web/                    React + Vite frontend
+│       └── src/
+│           ├── components/        PlayerBar, TrackCard, WaveformCanvas
+│           ├── pages/             Home, Discover, Track, Artist, Upload, Auth
+│           ├── hooks/             useAudioPlayer (Web Audio API)
+│           └── lib/               api.ts, playerStore, authStore
+├── docker-compose.yml
+├── deploy.sh                   Cloud Run deploy script
+└── package.json                Monorepo root
+```
+
+---
+
+## 🔌 API Endpoints
+
+```
+POST /api/auth/register         Rejestracja
+POST /api/auth/login            Logowanie
+
+GET  /api/tracks                Lista (filtr: genre, country, q)
+GET  /api/tracks/:id            Szczegóły tracku
+POST /api/tracks                Utwórz track [auth]
+DELETE /api/tracks/:id          Usuń [auth + owner]
+POST /api/tracks/:id/like       Toggle lajk [auth]
+POST /api/tracks/:id/comments   Dodaj komentarz [auth]
+
+GET  /api/users/:username       Profil artysty
+GET  /api/users/me/profile      Mój profil [auth]
+POST /api/users/:id/follow      Toggle follow [auth]
+
+POST /api/uploads/audio         Upload MP3/WAV → Supabase [auth]
+POST /api/uploads/cover         Upload JPG/PNG → Supabase [auth]
+```
+
+---
+
+## 🎯 Następne kroki
+
+- [ ] Real-time komentarze (Supabase Realtime)
+- [ ] BPM detection w przeglądarce (essentia.js-wasm)
+- [ ] Strona labelu
+- [ ] System powiadomień
+- [ ] Panel analityki dla artystów
+- [ ] Mobile app (React Native)
+- [ ] Domena basswave.io 👀
