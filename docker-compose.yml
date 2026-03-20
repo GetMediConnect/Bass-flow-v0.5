@@ -1,0 +1,54 @@
+# docker-compose.yml – lokalne środowisko developerskie
+version: '3.9'
+
+services:
+  # ── PostgreSQL (jeśli nie używasz Supabase lokalnie) ──
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB:       basswave
+      POSTGRES_USER:     basswave
+      POSTGRES_PASSWORD: basswave_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U basswave"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── API ──────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://basswave:basswave_dev@postgres:5432/basswave
+      DIRECT_URL:   postgresql://basswave:basswave_dev@postgres:5432/basswave
+      SUPABASE_URL:         ${SUPABASE_URL}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY}
+      JWT_SECRET:           ${JWT_SECRET}
+      NODE_ENV:             production
+      WEB_URL:              http://localhost:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Web ──────────────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3001
+    ports:
+      - "8080:8080"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

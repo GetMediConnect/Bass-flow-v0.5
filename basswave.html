@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"/>
+<title>BassWave – Drum & Bass Community</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#04050d;
+  --bg2:#080a14;
+  --bg3:#0d0f1e;
+  --surface:rgba(255,255,255,0.03);
+  --border:rgba(255,255,255,0.06);
+  --border-glow:rgba(51,228,255,0.25);
+  --cyan:#33e4ff;
+  --violet:#7b5cff;
+  --magenta:#ff3366;
+  --amber:#ffaa00;
+  --text:#eef0ff;
+  --muted:#6b7090;
+  --muted2:#9ba0bd;
+  --r:10px;
+  --font-display:'Rajdhani',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --font-body:'DM Sans',sans-serif;
+  --player-h:76px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+::selection{background:rgba(51,228,255,0.25);color:#fff}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+
+/* ─── GRID LAYOUT ─── */
+.app{
+  display:grid;
+  grid-template-columns:220px minmax(0,1fr);
+  grid-template-rows:52px 1fr;
+  min-height:100vh;
+}
+header{
+  grid-column:1/3;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  border-bottom:1px solid var(--border);
+  background:rgba(4,5,13,0.92);
+  backdrop-filter:blur(14px);
+  position:sticky;top:0;z-index:50;
+  gap:12px;
+}
+aside{
+  border-right:1px solid var(--border);
+  background:linear-gradient(170deg,rgba(14,16,32,0.9) 0,rgba(4,5,13,0.97) 100%);
+  padding:12px 10px 100px;
+  overflow-y:auto;
+  position:sticky;
+  top:52px;
+  height:calc(100vh - 52px);
+}
+main{
+  padding:20px 22px calc(var(--player-h) + 24px);
+  overflow-y:auto;
+  min-width:0;
+}
+
+/* ─── HEADER ─── */
+.logo{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-display);
+  font-weight:700;font-size:18px;
+  letter-spacing:0.12em;text-transform:uppercase;
+  flex-shrink:0;
+}
+.logo-mark{
+  width:24px;height:24px;border-radius:6px;
+  background:conic-gradient(from 200deg,#33e4ff,#7b5cff,#ff3366,#33e4ff);
+  box-shadow:0 0 18px rgba(51,228,255,0.7);
+  animation:spinmark 8s linear infinite;
+}
+@keyframes spinmark{to{filter:hue-rotate(360deg)}}
+
+.search{
+  flex:1;max-width:380px;position:relative;
+}
+.search input{
+  width:100%;
+  padding:7px 12px 7px 34px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.03);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:12px;
+  outline:none;
+  transition:border-color .2s;
+}
+.search input:focus{border-color:rgba(51,228,255,0.4);background:rgba(51,228,255,0.04)}
+.search input::placeholder{color:var(--muted)}
+.search-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  color:var(--muted);font-size:12px;pointer-events:none;
+}
+
+.h-actions{display:flex;align-items:center;gap:8px}
+.icon-btn{
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.04);
+  color:var(--muted2);display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+  transition:background .15s,color .15s;
+}
+.icon-btn:hover{background:rgba(255,255,255,0.09);color:var(--text)}
+.badge-wrap{position:relative}
+.badge{
+  position:absolute;top:-2px;right:-2px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--magenta);border:2px solid var(--bg);
+}
+.avatar{
+  width:30px;height:30px;border-radius:50%;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;font-size:13px;
+  cursor:pointer;
+}
+
+/* ─── SIDEBAR ─── */
+.nav-label{
+  font-family:var(--font-mono);
+  font-size:9px;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--muted);padding:10px 8px 4px;
+}
+.nav-list{list-style:none}
+.nav-item{
+  display:flex;align-items:center;gap:9px;
+  padding:7px 10px;border-radius:8px;
+  color:var(--muted2);font-size:12.5px;cursor:pointer;
+  transition:background .15s,color .15s;
+  position:relative;
+}
+.nav-item .ico{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-item.active{
+  background:rgba(51,228,255,0.1);
+  color:var(--cyan);
+}
+.nav-item.active::before{
+  content:'';
+  position:absolute;left:0;top:20%;bottom:20%;
+  width:2px;border-radius:2px;background:var(--cyan);
+  box-shadow:0 0 8px var(--cyan);
+}
+.nav-badge{
+  margin-left:auto;
+  font-family:var(--font-mono);font-size:10px;
+  background:rgba(51,228,255,0.12);color:var(--cyan);
+  padding:1px 6px;border-radius:999px;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--magenta);
+  margin-left:auto;box-shadow:0 0 6px var(--magenta);
+  animation:pulse 1.4s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+
+/* ─── SECTION HEADER ─── */
+.section-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:14px;
+}
+.section-head h2{
+  font-family:var(--font-display);
+  font-size:20px;font-weight:700;letter-spacing:0.04em;
+}
+.section-head .sub{font-size:12px;color:var(--muted2)}
+.see-all{
+  font-family:var(--font-mono);font-size:10px;
+  color:var(--cyan);letter-spacing:0.08em;cursor:pointer;
+  border:none;background:none;padding:4px 8px;
+  border-radius:999px;border:1px solid rgba(51,228,255,0.25);
+  transition:background .15s;
+}
+.see-all:hover{background:rgba(51,228,255,0.1)}
+
+/* ─── GENRE PILLS ─── */
+.genre-row{
+  display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
+}
+.genre-pill{
+  padding:5px 12px;border-radius:999px;border:none;cursor:pointer;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;
+  background:rgba(255,255,255,0.04);color:var(--muted2);
+  transition:all .15s;
+}
+.genre-pill.active{
+  background:rgba(51,228,255,0.15);
+  color:var(--cyan);
+  border:1px solid rgba(51,228,255,0.35);
+  box-shadow:0 0 12px rgba(51,228,255,0.15);
+}
+.genre-pill:hover:not(.active){background:rgba(255,255,255,0.08);color:var(--text)}
+
+/* ─── TRACK CARDS ─── */
+.tracks-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(270px,1fr));
+  gap:12px;
+  margin-bottom:28px;
+}
+.track-card{
+  background:radial-gradient(ellipse at top,rgba(123,92,255,0.12) 0,rgba(8,10,20,0.9) 70%);
+  border-radius:var(--r);
+  border:1px solid var(--border);
+  padding:12px;
+  display:flex;flex-direction:column;gap:10px;
+  transition:border-color .2s,transform .2s;
+  cursor:default;
+  animation:fadein .4s both;
+}
+.track-card:hover{
+  border-color:rgba(51,228,255,0.2);
+  transform:translateY(-2px);
+}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.track-card:nth-child(2){animation-delay:.06s}
+.track-card:nth-child(3){animation-delay:.12s}
+.track-card:nth-child(4){animation-delay:.18s}
+.track-card:nth-child(5){animation-delay:.24s}
+
+.track-top{display:flex;gap:10px}
+.cover{
+  width:54px;height:54px;border-radius:10px;
+  flex-shrink:0;position:relative;overflow:hidden;
+}
+.cover canvas{width:100%;height:100%;display:block}
+
+.track-meta{flex:1;min-width:0}
+.track-title{
+  font-family:var(--font-display);
+  font-size:15px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:2px;
+}
+.track-artist{font-size:11.5px;color:var(--muted2);margin-bottom:5px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{
+  font-family:var(--font-mono);font-size:9px;
+  padding:2px 7px;border-radius:999px;
+  background:rgba(0,0,0,0.5);color:var(--muted2);
+  letter-spacing:0.04em;
+}
+.tag.bpm{color:var(--amber);background:rgba(255,170,0,0.1)}
+.tag.country{color:var(--cyan);background:rgba(51,228,255,0.08)}
+
+/* waveform canvas */
+.waveform-wrap{
+  height:30px;border-radius:6px;overflow:hidden;
+  background:rgba(0,0,0,0.3);cursor:pointer;position:relative;
+}
+.waveform-wrap canvas{width:100%;height:100%;display:block}
+.waveform-wrap .wf-time{
+  position:absolute;right:6px;bottom:3px;
+  font-family:var(--font-mono);font-size:9px;color:var(--muted);
+}
+
+.card-actions{
+  display:flex;justify-content:space-between;align-items:center;
+}
+.la,.ra{display:flex;gap:6px;align-items:center}
+.btn-play{
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  background:var(--cyan);color:#02040c;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;flex-shrink:0;
+  transition:transform .1s,box-shadow .1s;
+}
+.btn-play:hover{transform:scale(1.1);box-shadow:0 0 16px rgba(51,228,255,0.5)}
+.btn-play.playing{background:var(--violet)}
+.btn-ghost{
+  padding:4px 9px;border-radius:999px;border:1px solid var(--border);
+  background:transparent;color:var(--muted2);
+  font-size:11px;font-family:var(--font-body);
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.15);color:var(--text)}
+.btn-like.liked{color:var(--magenta);border-color:rgba(255,51,102,0.3)}
+
+/* ─── FEATURED STRIP ─── */
+.featured{
+  background:linear-gradient(120deg,rgba(51,228,255,0.06) 0,rgba(123,92,255,0.1) 60%,rgba(255,51,102,0.06) 100%);
+  border:1px solid rgba(51,228,255,0.12);
+  border-radius:14px;
+  padding:18px 20px;
+  display:flex;align-items:center;gap:18px;
+  margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.featured::before{
+  content:'FEATURED';
+  position:absolute;top:10px;right:14px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:0.2em;
+  color:var(--amber);opacity:.7;
+}
+.featured-art{
+  width:70px;height:70px;border-radius:12px;
+  background:conic-gradient(from 180deg,#33e4ff,#7b5cff,#ff3366,#33e4ff);
+  flex-shrink:0;box-shadow:0 0 28px rgba(123,92,255,0.5);
+  animation:artRotate 10s linear infinite;
+}
+@keyframes artRotate{to{filter:hue-rotate(360deg)}}
+.featured-info h3{
+  font-family:var(--font-display);font-size:20px;font-weight:700;
+  margin-bottom:3px;
+}
+.featured-info p{font-size:12px;color:var(--muted2);margin-bottom:10px}
+.featured-info .feat-tags{display:flex;gap:6px}
+.feat-btn{
+  padding:7px 18px;border-radius:999px;border:none;cursor:pointer;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  color:#020308;font-family:var(--font-display);font-weight:700;font-size:14px;
+  letter-spacing:0.06em;margin-left:auto;
+  transition:opacity .15s,transform .1s;flex-shrink:0;
+}
+.feat-btn:hover{opacity:.85;transform:scale(1.04)}
+
+/* ─── PRODUCERS ROW ─── */
+.producers-row{
+  display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;
+  margin-bottom:28px;
+}
+.producers-row::-webkit-scrollbar{height:0}
+.prod-card{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;flex-shrink:0;
+  min-width:100px;cursor:pointer;
+  transition:border-color .2s,transform .2s;
+  animation:fadein .5s both;
+}
+.prod-card:hover{border-color:rgba(123,92,255,0.4);transform:translateY(-2px)}
+.prod-av{
+  width:44px;height:44px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-weight:700;font-size:16px;
+}
+.prod-name{
+  font-family:var(--font-display);font-size:12px;font-weight:600;
+  text-align:center;letter-spacing:0.04em;
+}
+.prod-genre{font-family:var(--font-mono);font-size:9px;color:var(--muted);text-align:center}
+.online-dot{
+  width:8px;height:8px;border-radius:50%;
+  margin-top:-4px;margin-bottom:2px;
+}
+
+/* ─── PLAYER ─── */
+.player{
+  position:fixed;bottom:0;left:0;right:0;
+  height:var(--player-h);
+  background:rgba(4,5,13,0.96);
+  border-top:1px solid var(--border);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;
+  padding:0 16px;gap:14px;
+  z-index:100;
+}
+.player-glow{
+  position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan) 30%,var(--violet) 70%,transparent);
+  opacity:.5;
+}
+.p-cover{
+  width:44px;height:44px;border-radius:8px;
+  flex-shrink:0;overflow:hidden;position:relative;
+}
+.p-cover canvas{width:100%;height:100%}
+
+.p-info{flex:0 0 200px;min-width:0}
+.p-title{
+  font-family:var(--font-display);font-size:15px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.p-artist{font-size:11px;color:var(--muted2)}
+
+.p-main{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.p-progress{
+  height:4px;border-radius:999px;
+  background:rgba(255,255,255,0.08);
+  cursor:pointer;position:relative;
+}
+.p-progress-fill{
+  height:100%;border-radius:999px;
+  background:linear-gradient(90deg,var(--cyan),var(--violet));
+  box-shadow:0 0 10px rgba(51,228,255,0.6);
+  transition:width .5s linear;
+  pointer-events:none;
+}
+.p-progress:hover .p-thumb{opacity:1}
+.p-thumb{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:12px;height:12px;border-radius:50%;
+  background:#fff;margin-left:-6px;
+  opacity:0;transition:opacity .15s;pointer-events:none;
+}
+
+.p-time-row{display:flex;justify-content:space-between}
+.p-time{font-family:var(--font-mono);font-size:10px;color:var(--muted)}
+
+.p-controls{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.p-btn{
+  width:32px;height:32px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,0.04);
+  color:var(--muted2);font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.p-btn:hover{background:rgba(255,255,255,0.09);color:var(--text)}
+.p-btn.primary{
+  width:38px;height:38px;font-size:16px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  color:#020308;
+  box-shadow:0 0 18px rgba(51,228,255,0.35);
+}
+.p-btn.primary:hover{box-shadow:0 0 26px rgba(51,228,255,0.55)}
+.p-vol{
+  display:flex;align-items:center;gap:6px;flex-shrink:0;
+}
+.vol-slider{
+  -webkit-appearance:none;
+  width:72px;height:3px;border-radius:3px;
+  background:rgba(255,255,255,0.12);cursor:pointer;outline:none;
+}
+.vol-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:10px;height:10px;border-radius:50%;
+  background:var(--cyan);cursor:pointer;
+  box-shadow:0 0 6px rgba(51,228,255,0.5);
+}
+
+/* ─── VISUALIZER BAR ─── */
+.vis-bar{
+  display:flex;align-items:flex-end;gap:2px;height:18px;
+  flex-shrink:0;
+}
+.vis-bar span{
+  display:block;
+  width:3px;border-radius:2px;
+  background:linear-gradient(to top,var(--violet),var(--cyan));
+  animation:vib 0.4s ease-in-out infinite alternate;
+}
+.vis-bar span:nth-child(1){animation-delay:.0s}
+.vis-bar span:nth-child(2){animation-delay:.05s}
+.vis-bar span:nth-child(3){animation-delay:.1s}
+.vis-bar span:nth-child(4){animation-delay:.15s}
+.vis-bar span:nth-child(5){animation-delay:.2s}
+.vis-bar span:nth-child(6){animation-delay:.08s}
+.vis-bar span:nth-child(7){animation-delay:.13s}
+@keyframes vib{
+  from{height:4px;opacity:.5}
+  to{height:18px;opacity:1}
+}
+.vis-bar.paused span{animation-play-state:paused;height:4px;opacity:.3}
+
+/* ─── MOBILE ─── */
+@media(max-width:820px){
+  .app{grid-template-columns:0 1fr}
+  aside{display:none}
+  .search{display:none}
+  .p-info,.p-vol{display:none}
+  main{padding-inline:12px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <span>BassWave</span>
+  </div>
+  <div class="search">
+    <span class="search-icon">⌕</span>
+    <input type="text" placeholder="Szukaj tracków, artystów, labeli…" id="searchInput"/>
+  </div>
+  <div class="h-actions">
+    <div class="badge-wrap">
+      <button class="icon-btn" title="Powiadomienia">🔔</button>
+      <div class="badge"></div>
+    </div>
+    <button class="icon-btn" title="Wiadomości">💬</button>
+    <div class="avatar" title="DJ.Maduki">M</div>
+  </div>
+</header>
+
+<!-- ─── SIDEBAR ─── -->
+<aside>
+  <div class="nav-label">Nawigacja</div>
+  <ul class="nav-list">
+    <li class="nav-item active" onclick="setNav(this)"><span class="ico">🏠</span><span>Home</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">✨</span><span>Odkrywaj</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">🎛️</span><span>Projekty</span><span class="nav-badge">3</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">💬</span><span>Forum</span><span class="nav-badge">12</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">📂</span><span>Biblioteka</span></li>
+  </ul>
+  <div class="nav-label">Na żywo</div>
+  <ul class="nav-list">
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">📻</span><span>Radio 24/7</span><span class="live-dot"></span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">📅</span><span>Wydarzenia</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">🎙️</span><span>Mix Sessions</span></li>
+  </ul>
+  <div class="nav-label">Dla labeli</div>
+  <ul class="nav-list">
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">🏷️</span><span>Panel labela</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">📈</span><span>Analityka</span></li>
+    <li class="nav-item" onclick="setNav(this)"><span class="ico">⚙️</span><span>Ustawienia</span></li>
+  </ul>
+</aside>
+
+<!-- ─── MAIN ─── -->
+<main>
+
+  <!-- Featured -->
+  <div class="featured">
+    <div class="featured-art"></div>
+    <div class="featured-info">
+      <h3>Miłość w Czasach Klik</h3>
+      <p>DJ.Maduki · Liquid DnB · 174 BPM</p>
+      <div class="feat-tags">
+        <span class="tag bpm">174 BPM</span>
+        <span class="tag country">PL</span>
+        <span class="tag">Liquid DnB</span>
+      </div>
+    </div>
+    <button class="feat-btn" onclick="playTrack(0)">▶ Odtwórz</button>
+  </div>
+
+  <!-- Genre filter -->
+  <div class="genre-row" id="genreRow">
+    <button class="genre-pill active" onclick="filterGenre(this,'all')">Wszystko</button>
+    <button class="genre-pill" onclick="filterGenre(this,'liquid')">Liquid</button>
+    <button class="genre-pill" onclick="filterGenre(this,'neuro')">Neurofunk</button>
+    <button class="genre-pill" onclick="filterGenre(this,'jump')">Jump Up</button>
+    <button class="genre-pill" onclick="filterGenre(this,'tech')">Tech DnB</button>
+    <button class="genre-pill" onclick="filterGenre(this,'darkstep')">Darkstep</button>
+  </div>
+
+  <!-- Tracks -->
+  <div class="section-head">
+    <div><h2>Dla Ciebie</h2><div class="sub">Nowe z Twojej sceny · <span id="trackCount">5</span> tracków</div></div>
+    <button class="see-all">POKAŻ WIĘCEJ →</button>
+  </div>
+  <div class="tracks-grid" id="tracksGrid"></div>
+
+  <!-- Producers -->
+  <div class="section-head" style="margin-top:4px">
+    <div><h2>Producenci online</h2><div class="sub">Aktywni teraz</div></div>
+    <button class="see-all">WSZYSCY →</button>
+  </div>
+  <div class="producers-row" id="prodsRow"></div>
+
+</main>
+
+<!-- ─── PLAYER ─── -->
+<div class="player" id="playerBar">
+  <div class="player-glow"></div>
+  <div class="p-cover"><canvas id="coverCanvas" width="44" height="44"></canvas></div>
+  <div class="p-info">
+    <div class="p-title" id="pTitle">Miłość w Czasach Klik</div>
+    <div class="p-artist" id="pArtist">DJ.Maduki – Liquid DnB</div>
+  </div>
+  <div class="p-main">
+    <div class="p-progress" id="progressBar" onclick="seekTo(event)">
+      <div class="p-progress-fill" id="progressFill" style="width:0%"></div>
+      <div class="p-thumb" id="progressThumb" style="left:0%"></div>
+    </div>
+    <div class="p-time-row">
+      <span class="p-time" id="pCurrent">0:00</span>
+      <span class="p-time" id="pTotal">4:12</span>
+    </div>
+  </div>
+  <div class="p-controls">
+    <button class="p-btn" onclick="prevTrack()" title="Poprzedni">⏮</button>
+    <button class="p-btn primary" id="playBtn" onclick="togglePlay()">▶</button>
+    <button class="p-btn" onclick="nextTrack()" title="Następny">⏭</button>
+  </div>
+  <div class="vis-bar paused" id="visBar">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="p-vol">
+    <span style="font-size:14px;color:var(--muted2)">🔊</span>
+    <input type="range" class="vol-slider" min="0" max="100" value="80" id="volSlider" oninput="setVol(this.value)"/>
+  </div>
+</div>
+
+</div><!-- .app -->
+
+<script>
+/* ────────────────────────────
+   DATA
+──────────────────────────── */
+const TRACKS = [
+  {id:0, title:"Miłość w Czasach Klik", artist:"DJ.Maduki", genre:"liquid", bpm:174, country:"PL", tags:["Liquid DnB"], dur:"4:12", dur_s:252, likes:128, colors:["#33e4ff","#7b5cff"]},
+  {id:1, title:"Neon Steps",            artist:"Unknown Producer", genre:"neuro", bpm:172, country:"UK", tags:["Neurofunk"], dur:"5:03", dur_s:303, likes:89, colors:["#ff3366","#7b5cff"]},
+  {id:2, title:"Beton Sunrise",         artist:"Kameleon",  genre:"tech", bpm:176, country:"PL", tags:["Tech DnB"], dur:"6:44", dur_s:404, likes:212, colors:["#ffaa00","#ff3366"]},
+  {id:3, title:"Orbital Dust",          artist:"Synaptic",  genre:"darkstep", bpm:170, country:"DE", tags:["Darkstep"], dur:"5:28", dur_s:328, likes:56, colors:["#7b5cff","#33e4ff"]},
+  {id:4, title:"Głęboka Woda",          artist:"DJ.Maduki", genre:"liquid", bpm:174, country:"PL", tags:["Liquid DnB"], dur:"3:51", dur_s:231, likes:341, colors:["#33e4ff","#ffaa00"]},
+];
+
+const PRODUCERS = [
+  {name:"DJ.Maduki", genre:"Liquid DnB", color:"#33e4ff", online:true},
+  {name:"Kameleon",  genre:"Tech DnB",   color:"#ffaa00", online:true},
+  {name:"Synaptic",  genre:"Darkstep",   color:"#7b5cff", online:false},
+  {name:"Nooky",     genre:"Neurofunk",  color:"#ff3366", online:true},
+  {name:"Fracture",  genre:"Jump Up",    color:"#ff6b35", online:false},
+  {name:"Sota",      genre:"Liquid",     color:"#4cffb2", online:true},
+];
+
+/* ────────────────────────────
+   STATE
+──────────────────────────── */
+let currentIdx = 0;
+let playing = false;
+let progress = 0; // 0-1
+let likes = TRACKS.map(t => t.likes);
+let likedSet = new Set();
+let filterActive = 'all';
+let timer = null;
+let animFrame = null;
+
+/* ────────────────────────────
+   CANVAS COVERS
+──────────────────────────── */
+function drawCover(canvas, colors, size=54){
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,size,size);
+  grad.addColorStop(0, colors[0]);
+  grad.addColorStop(1, colors[1]);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,size,size);
+  // circles
+  ctx.globalAlpha = 0.25;
+  ctx.fillStyle = '#fff';
+  ctx.beginPath(); ctx.arc(size*.7,size*.3,size*.4,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 0.15;
+  ctx.beginPath(); ctx.arc(size*.2,size*.8,size*.35,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+  // mini waveform hint
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for(let x=4;x<size-4;x+=3){
+    const h = Math.sin(x*0.4+colors[0].charCodeAt(1)*0.1)*6+8;
+    ctx.moveTo(x, size/2-h); ctx.lineTo(x, size/2+h);
+  }
+  ctx.stroke();
+}
+
+function drawWaveform(canvas, colors, progress=0){
+  const w = canvas.width; const h = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,w,h);
+  const bars = Math.floor(w/3);
+  for(let i=0;i<bars;i++){
+    const x = i*3+1;
+    const played = x/w < progress;
+    const ht = (Math.sin(i*0.28)*0.35 + Math.sin(i*0.11)*0.3 + 0.35) * h * 0.85;
+    if(played){
+      const g = ctx.createLinearGradient(0,0,0,h);
+      g.addColorStop(0,colors[0]); g.addColorStop(1,colors[1]);
+      ctx.fillStyle = g;
+      ctx.globalAlpha = 0.9;
+    } else {
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.globalAlpha = 1;
+    }
+    ctx.fillRect(x, (h-ht)/2, 2, ht);
+  }
+  ctx.globalAlpha = 1;
+  // playhead
+  if(progress > 0){
+    const px = progress*w;
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.fillRect(px-1,0,2,h);
+    ctx.shadowColor='#fff'; ctx.shadowBlur=6;
+    ctx.fillRect(px-1,0,2,h);
+    ctx.shadowBlur=0;
+  }
+}
+
+/* ────────────────────────────
+   RENDER TRACKS
+──────────────────────────── */
+function renderTracks(filter='all'){
+  const grid = document.getElementById('tracksGrid');
+  grid.innerHTML = '';
+  const visible = TRACKS.filter(t => filter==='all' || t.genre===filter);
+  document.getElementById('trackCount').textContent = visible.length;
+
+  visible.forEach(t => {
+    const card = document.createElement('article');
+    card.className = 'track-card';
+    card.dataset.id = t.id;
+    const isPlaying = playing && currentIdx === t.id;
+    card.innerHTML = `
+      <div class="track-top">
+        <div class="cover"><canvas id="cov${t.id}" width="54" height="54"></canvas></div>
+        <div class="track-meta">
+          <div class="track-title">${t.title}</div>
+          <div class="track-artist">${t.artist}</div>
+          <div class="tags">
+            ${t.tags.map(g=>`<span class="tag">${g}</span>`).join('')}
+            <span class="tag bpm">${t.bpm} BPM</span>
+            <span class="tag country">${t.country}</span>
+          </div>
+        </div>
+      </div>
+      <div class="waveform-wrap" onclick="wfClick(event,${t.id})">
+        <canvas id="wf${t.id}" height="30"></canvas>
+        <span class="wf-time">${t.dur}</span>
+      </div>
+      <div class="card-actions">
+        <div class="la">
+          <button class="btn-play${isPlaying?' playing':''}" id="pbtn${t.id}" onclick="playTrack(${t.id})">${isPlaying?'⏸':'▶'}</button>
+          <button class="btn-ghost">Otwórz projekt</button>
+        </div>
+        <div class="ra">
+          <button class="btn-ghost btn-like${likedSet.has(t.id)?' liked':''}" id="lbtn${t.id}" onclick="toggleLike(${t.id})">♡ <span id="lc${t.id}">${likes[t.id]}</span></button>
+          <button class="btn-ghost">⋯</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+
+    requestAnimationFrame(()=>{
+      const cov = document.getElementById('cov'+t.id);
+      if(cov) drawCover(cov, t.colors, 54);
+      const wf = document.getElementById('wf'+t.id);
+      if(wf){
+        wf.width = wf.parentElement.clientWidth || 240;
+        const prog = (currentIdx===t.id) ? progress : 0;
+        drawWaveform(wf, t.colors, prog);
+      }
+    });
+  });
+}
+
+/* ────────────────────────────
+   RENDER PRODUCERS
+──────────────────────────── */
+function renderProducers(){
+  const row = document.getElementById('prodsRow');
+  PRODUCERS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'prod-card';
+    card.innerHTML = `
+      <div class="prod-av" style="background:linear-gradient(135deg,${p.color}33,${p.color}88)">${p.name[0]}</div>
+      <div class="online-dot" style="background:${p.online?'#4cffb2':'#444'};box-shadow:${p.online?'0 0 8px #4cffb2':''};"></div>
+      <div class="prod-name">${p.name}</div>
+      <div class="prod-genre">${p.genre}</div>`;
+    row.appendChild(card);
+  });
+}
+
+/* ────────────────────────────
+   PLAYER
+──────────────────────────── */
+function updatePlayerUI(){
+  const t = TRACKS[currentIdx];
+  document.getElementById('pTitle').textContent = t.title;
+  document.getElementById('pArtist').textContent = t.artist + ' – ' + t.tags[0];
+  document.getElementById('pTotal').textContent = t.dur;
+  // cover
+  const cc = document.getElementById('coverCanvas');
+  drawCover(cc, t.colors, 44);
+  // progress
+  const pct = (progress*100).toFixed(1)+'%';
+  document.getElementById('progressFill').style.width = pct;
+  document.getElementById('progressThumb').style.left = pct;
+  // time
+  const cur = Math.round(progress * t.dur_s);
+  document.getElementById('pCurrent').textContent = fmt(cur);
+  // waveform
+  const wf = document.getElementById('wf'+currentIdx);
+  if(wf) drawWaveform(wf, t.colors, progress);
+  // card play buttons
+  TRACKS.forEach(tr => {
+    const pb = document.getElementById('pbtn'+tr.id);
+    if(pb){ pb.className = 'btn-play'+(playing && currentIdx===tr.id?' playing':''); pb.textContent = (playing && currentIdx===tr.id)?'⏸':'▶'; }
+  });
+  document.getElementById('playBtn').textContent = playing ? '⏸' : '▶';
+  document.getElementById('visBar').className = 'vis-bar'+(playing?'':' paused');
+}
+
+function fmt(s){
+  return Math.floor(s/60)+':'+(s%60<10?'0':'')+(s%60);
+}
+
+function startTimer(){
+  if(timer) clearInterval(timer);
+  timer = setInterval(()=>{
+    if(!playing) return;
+    const t = TRACKS[currentIdx];
+    progress += 1/t.dur_s;
+    if(progress >= 1){ progress=0; nextTrack(); return; }
+    updatePlayerUI();
+  }, 1000);
+}
+
+function playTrack(idx){
+  if(currentIdx !== idx){ progress = 0; }
+  currentIdx = idx;
+  if(playing && currentIdx === idx){ playing = false; }
+  else { playing = true; startTimer(); }
+  updatePlayerUI();
+}
+
+function togglePlay(){
+  playing = !playing;
+  if(playing) startTimer();
+  else clearInterval(timer);
+  updatePlayerUI();
+}
+
+function nextTrack(){
+  currentIdx = (currentIdx+1)%TRACKS.length;
+  progress=0;
+  if(playing) startTimer();
+  updatePlayerUI();
+}
+
+function prevTrack(){
+  if(progress > 0.05){ progress=0; updatePlayerUI(); return; }
+  currentIdx = (currentIdx-1+TRACKS.length)%TRACKS.length;
+  progress=0;
+  if(playing) startTimer();
+  updatePlayerUI();
+}
+
+function seekTo(e){
+  const bar = document.getElementById('progressBar');
+  const rect = bar.getBoundingClientRect();
+  progress = Math.max(0,Math.min(1,(e.clientX-rect.left)/rect.width));
+  updatePlayerUI();
+}
+
+function wfClick(e, id){
+  const wrap = e.currentTarget;
+  const rect = wrap.getBoundingClientRect();
+  const frac = (e.clientX-rect.left)/rect.width;
+  if(currentIdx !== id){ currentIdx=id; progress=frac; playing=true; startTimer(); }
+  else { progress=frac; }
+  updatePlayerUI();
+}
+
+function setVol(v){}
+
+/* ────────────────────────────
+   LIKES
+──────────────────────────── */
+function toggleLike(id){
+  if(likedSet.has(id)){ likedSet.delete(id); likes[id]--; }
+  else { likedSet.add(id); likes[id]++; }
+  const btn = document.getElementById('lbtn'+id);
+  const cnt = document.getElementById('lc'+id);
+  if(btn) btn.className = 'btn-ghost btn-like'+(likedSet.has(id)?' liked':'');
+  if(cnt) cnt.textContent = likes[id];
+}
+
+/* ────────────────────────────
+   NAV
+──────────────────────────── */
+function setNav(el){
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function filterGenre(el, genre){
+  document.querySelectorAll('.genre-pill').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  filterActive = genre;
+  renderTracks(genre);
+}
+
+/* ────────────────────────────
+   SEARCH
+──────────────────────────── */
+document.getElementById('searchInput').addEventListener('input', e=>{
+  const q = e.target.value.toLowerCase();
+  if(!q){ renderTracks(filterActive); return; }
+  const filtered = TRACKS.filter(t=>
+    t.title.toLowerCase().includes(q) ||
+    t.artist.toLowerCase().includes(q) ||
+    t.tags.some(g=>g.toLowerCase().includes(q))
+  );
+  const grid = document.getElementById('tracksGrid');
+  grid.innerHTML='';
+  filtered.forEach(t=>{
+    // re-use render by temporarily overriding
+    const all = filterActive;
+    filterActive = 'all';
+    renderTracks('all');
+    filterActive = all;
+    return;
+  });
+  // simple: just re-render with a custom filter
+  renderTracksCustom(filtered);
+});
+
+function renderTracksCustom(list){
+  const grid = document.getElementById('tracksGrid');
+  grid.innerHTML='';
+  document.getElementById('trackCount').textContent = list.length;
+  list.forEach(t=>{
+    const orig = filterActive;
+    filterActive = t.genre;
+    // just reuse same card creation inline
+    filterActive = orig;
+  });
+  // Actually just call renderTracks but swap data temporarily
+  const backup = [...TRACKS];
+  TRACKS.length=0; list.forEach(t=>TRACKS.push(t));
+  renderTracks('all');
+  TRACKS.length=0; backup.forEach(t=>TRACKS.push(t));
+}
+
+/* ────────────────────────────
+   INIT
+──────────────────────────── */
+renderTracks('all');
+renderProducers();
+updatePlayerUI();
+
+// resize waveforms on layout settle
+window.addEventListener('resize', ()=>{
+  TRACKS.forEach(t=>{
+    const wf = document.getElementById('wf'+t.id);
+    if(wf){ wf.width = wf.parentElement.clientWidth||240; drawWaveform(wf,t.colors,currentIdx===t.id?progress:0); }
+  });
+});
+</script>
+</body>
+</html>
