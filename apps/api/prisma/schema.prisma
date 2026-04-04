@@ -1,0 +1,105 @@
+// Prisma schema — BassFlow Creator Hub
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── Users ────────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  xp           Int      @default(0)
+  role         UserRole @default(CREATOR)
+  bio          String?
+  avatarUrl    String?  @map("avatar_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  tracks Track[]
+  likes  Like[]
+  djSets DJSet[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  CREATOR
+  DJ
+  ADMIN
+}
+
+// ─── Tracks ───────────────────────────────────────────────────────────────────
+
+model Track {
+  id         String  @id @default(cuid())
+  title      String
+  artist     String
+  genre      Genre   @default(OTHER)
+  bpm        Int?
+  musicalKey String? @map("musical_key")
+  camelot    String?
+  audioUrl   String  @map("audio_url")
+  coverUrl   String? @map("cover_url")
+  duration   Float?  // seconds
+  userId     String  @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes Like[]
+
+  @@map("tracks")
+}
+
+enum Genre {
+  LIQUID
+  NEURO
+  JUMP_UP
+  TECHSTEP
+  JUNGLE
+  DARKSTEP
+  HALFTIME
+  OTHER
+}
+
+// ─── Likes ────────────────────────────────────────────────────────────────────
+
+model Like {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  trackId   String   @map("track_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  track Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackId])
+  @@map("likes")
+}
+
+// ─── DJ Sets ──────────────────────────────────────────────────────────────────
+
+model DJSet {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String   @map("user_id")
+  // stored as JSON array of { title, artist, bpm, key, energy }
+  tracks    Json     @default("[]")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("dj_sets")
+}

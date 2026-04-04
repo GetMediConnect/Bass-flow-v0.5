@@ -97,7 +97,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
 select.inp option{background:#111}
 textarea.inp{resize:vertical;min-height:80px;line-height:1.5}
 .field{margin-bottom:14px}
-.field label{display:block;margin-bottom:6px;font-size:10px;letter-spacing:1px;
+.field label,.field-label{display:block;margin-bottom:6px;font-size:10px;letter-spacing:1px;
   text-transform:uppercase;color:var(--t3);font-family:'DM Mono',monospace}
 
 /* ── RANGE SLIDER ── */
@@ -488,9 +488,52 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
     <div style="width:34px;height:34px;border-radius:8px;background:rgba(0,255,157,.12);
       color:var(--g);border:1px solid rgba(0,255,157,.3);display:flex;align-items:center;
       justify-content:center;font-family:'Syne',sans-serif;font-weight:800;cursor:pointer"
-      id="navAv">M</div>
+      id="navAv" onclick="openAuthModal()">?</div>
   </div>
 </nav>
+
+<!-- ═══ AUTH MODAL ═══ -->
+<div id="authOverlay" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:18px;padding:32px;width:360px;max-width:95vw;position:relative">
+    <button onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:var(--t2);font-size:20px;cursor:pointer">✕</button>
+
+    <!-- Login form -->
+    <div id="authLogin">
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Sign In</h3>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:20px">Log in to sync XP, tracks and sets across devices.</p>
+      <div class="field"><label class="field-label">Email</label><input class="inp" id="liEmail" type="email" placeholder="dj@bassflow.io"></div>
+      <div class="field"><label class="field-label">Password</label><input class="inp" id="liPass" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-g btn-full" style="margin-top:4px" onclick="apiLogin()">Sign In</button>
+      <p style="text-align:center;font-size:12px;color:var(--t3);margin-top:14px">No account? <a href="#" style="color:var(--g)" onclick="switchAuth('reg')">Register →</a></p>
+    </div>
+
+    <!-- Register form -->
+    <div id="authReg" style="display:none">
+      <h3 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:6px">Create Account</h3>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:20px">Join the BassFlow community — free.</p>
+      <div class="field"><label class="field-label">Username</label><input class="inp" id="regUser" type="text" placeholder="DJ_Name"></div>
+      <div class="field"><label class="field-label">Email</label><input class="inp" id="regEmail" type="email" placeholder="dj@bassflow.io"></div>
+      <div class="field"><label class="field-label">Password</label><input class="inp" id="regPass" type="password" placeholder="min 8 chars"></div>
+      <button class="btn btn-p btn-full" style="margin-top:4px" onclick="apiRegister()">Create Account</button>
+      <p style="text-align:center;font-size:12px;color:var(--t3);margin-top:14px">Have an account? <a href="#" style="color:var(--g)" onclick="switchAuth('login')">Sign in →</a></p>
+    </div>
+
+    <!-- Logged-in view -->
+    <div id="authUser" style="display:none">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="width:56px;height:56px;border-radius:14px;background:rgba(0,255,157,.12);color:var(--g);font-family:'Syne',sans-serif;font-size:24px;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 10px" id="auAvatar">?</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px" id="auName">DJ</div>
+        <div style="font-size:11px;color:var(--t3);font-family:'DM Mono',monospace" id="auEmail">—</div>
+      </div>
+      <div style="background:var(--s2);border-radius:10px;padding:12px;display:flex;justify-content:space-around;margin-bottom:16px">
+        <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-weight:800;color:var(--g);font-size:20px" id="auXP">0</div><div style="font-size:10px;color:var(--t3)">XP</div></div>
+        <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-weight:800;color:var(--p);font-size:20px" id="auTracks">0</div><div style="font-size:10px;color:var(--t3)">Tracks</div></div>
+        <div style="text-align:center"><div style="font-family:'Syne',sans-serif;font-weight:800;color:var(--b);font-size:20px" id="auSets">0</div><div style="font-size:10px;color:var(--t3)">Sets</div></div>
+      </div>
+      <button class="btn btn-ghost btn-full btn-sm" onclick="apiLogout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ APP ═══ -->
 <div class="app z1">
@@ -523,9 +566,10 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
         <div style="font-size:10px;color:var(--t3);font-family:'DM Mono',monospace;letter-spacing:1px;margin-bottom:4px">XP LEVEL</div>
         <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--g)" id="sbXP">0</div>
         <div style="height:4px;background:var(--s4);border-radius:2px;margin-top:6px">
-          <div style="height:100%;background:linear-gradient(90deg,var(--g2),var(--g));border-radius:2px;width:45%;transition:width .5s"></div>
+          <div style="height:100%;background:linear-gradient(90deg,var(--g2),var(--g));border-radius:2px;width:45%;transition:width .5s" id="sbXPBar"></div>
         </div>
       </div>
+      <button class="btn btn-ghost btn-full btn-sm" id="sbAuthBtn" onclick="openAuthModal()"><i class="fas fa-user"></i> <span id="sbAuthLabel">Sign In</span></button>
     </div>
   </aside>
 
@@ -940,6 +984,10 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
             <div style="font-size:12px;color:var(--t2);line-height:1.7" id="setAdvice">Add tracks to get AI transition advice...</div>
           </div>
           <button class="btn btn-full btn-ghost btn-sm" style="margin-top:10px" onclick="exportSetlist()"><i class="fas fa-download"></i> Export Setlist PDF</button>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-full btn-g btn-sm" onclick="saveSetToCloud()"><i class="fas fa-cloud-arrow-up"></i> Save to Cloud</button>
+            <button class="btn btn-full btn-ghost btn-sm" onclick="loadSetsFromCloud()"><i class="fas fa-cloud-arrow-down"></i> Load Sets</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1681,22 +1729,315 @@ renderSet();
 renderCommunity();
 renderCharts();
 updateStats();
-// Start viz loop for live effect even without file
 startVizLoop();
-// Generate initial cover
 setTimeout(generateCoverArt,300);
 
-// Demo: simulate BPM in BPM screen when visited
 document.querySelectorAll('.nl,.si').forEach(el=>{
   el.addEventListener('click',function(){
     setTimeout(()=>{
       if(document.getElementById('sBPM').classList.contains('on')&&
          document.getElementById('bpmResults').style.display==='none'){
-        // auto-demo on first visit
       }
     },100);
   });
 });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     BassFlow API Client — connects all UI tools to the Express backend
+     API base URL is read from window.BASSFLOW_API_URL (set by server/CI)
+     or falls back to http://localhost:3001 for local development.
+════════════════════════════════════════════════════════════════════════════ -->
+<script>
+/* ──────────────────────── CONFIG ──────────────────────── */
+const API = (window.BASSFLOW_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+
+/* ──────────────────────── AUTH STATE ──────────────────── */
+let _token = localStorage.getItem('bf_token') || null;
+let _user  = JSON.parse(localStorage.getItem('bf_user') || 'null');
+
+function authHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (_token) h['Authorization'] = 'Bearer ' + _token;
+  return h;
+}
+
+async function apiFetch(method, path, body, isForm) {
+  const opts = { method, headers: isForm ? { 'Authorization': _token ? 'Bearer '+_token : '' } : authHeaders() };
+  if (body && !isForm) opts.body = JSON.stringify(body);
+  if (body && isForm)  opts.body = body;
+  try {
+    const r = await fetch(API + path, opts);
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+    return data;
+  } catch(e) {
+    toast('⚠️ ' + e.message, 'err');
+    throw e;
+  }
+}
+
+/* ──────────────────────── AUTH MODAL ──────────────────── */
+function openAuthModal() {
+  const ov = document.getElementById('authOverlay');
+  ov.style.display = 'flex';
+  if (_user) {
+    showAuthView('user');
+    refreshAuthUser();
+  } else {
+    showAuthView('login');
+  }
+}
+function closeAuthModal() {
+  document.getElementById('authOverlay').style.display = 'none';
+}
+function switchAuth(view) { showAuthView(view); }
+function showAuthView(v) {
+  ['authLogin','authReg','authUser'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  const map = { login:'authLogin', reg:'authReg', user:'authUser' };
+  document.getElementById(map[v] || 'authLogin').style.display = 'block';
+}
+document.getElementById('authOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeAuthModal();
+});
+
+async function apiLogin() {
+  const email    = document.getElementById('liEmail').value.trim();
+  const password = document.getElementById('liPass').value;
+  if (!email || !password) { toast('Fill in all fields', 'err'); return; }
+  try {
+    const { token, user } = await apiFetch('POST', '/auth/login', { email, password });
+    setSession(token, user);
+    toast('👋 Welcome back, ' + user.username + '!', 'xp');
+    closeAuthModal();
+  } catch {}
+}
+
+async function apiRegister() {
+  const username = document.getElementById('regUser').value.trim();
+  const email    = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPass').value;
+  if (!username || !email || !password) { toast('Fill in all fields', 'err'); return; }
+  try {
+    const { token, user } = await apiFetch('POST', '/auth/register', { username, email, password });
+    setSession(token, user);
+    toast('🎉 Account created! Welcome, ' + user.username + '!', 'xp');
+    closeAuthModal();
+  } catch {}
+}
+
+function apiLogout() {
+  clearSession();
+  toast('👋 Signed out', 'info');
+  closeAuthModal();
+}
+
+function setSession(token, user) {
+  _token = token;
+  _user  = user;
+  localStorage.setItem('bf_token', token);
+  localStorage.setItem('bf_user', JSON.stringify(user));
+  applyUserToUI(user);
+}
+
+function clearSession() {
+  _token = null;
+  _user  = null;
+  localStorage.removeItem('bf_token');
+  localStorage.removeItem('bf_user');
+  applyUserToUI(null);
+}
+
+function applyUserToUI(user) {
+  const navAv  = document.getElementById('navAv');
+  const navXP  = document.getElementById('navXP');
+  const sbXP   = document.getElementById('sbXP');
+  const sbBtn  = document.getElementById('sbAuthBtn');
+  const sbLbl  = document.getElementById('sbAuthLabel');
+  if (user) {
+    const initial = user.username.charAt(0).toUpperCase();
+    if (navAv) navAv.textContent = initial;
+    if (navXP) navXP.textContent = user.xp.toLocaleString() + ' XP';
+    if (sbXP)  sbXP.textContent  = user.xp.toLocaleString();
+    if (sbLbl) sbLbl.textContent = user.username;
+    xp = user.xp;
+  } else {
+    if (navAv) navAv.textContent = '?';
+    if (navXP) navXP.textContent = '0 XP';
+    if (sbXP)  sbXP.textContent  = '0';
+    if (sbLbl) sbLbl.textContent = 'Sign In';
+    xp = 0;
+  }
+}
+
+async function refreshAuthUser() {
+  if (!_token) return;
+  try {
+    const user = await apiFetch('GET', '/users/me');
+    _user = user;
+    localStorage.setItem('bf_user', JSON.stringify(user));
+    // update modal
+    const el = id => document.getElementById(id);
+    if (el('auName'))   el('auName').textContent   = user.username;
+    if (el('auEmail'))  el('auEmail').textContent  = user.email;
+    if (el('auAvatar')) el('auAvatar').textContent = user.username.charAt(0).toUpperCase();
+    if (el('auXP'))     el('auXP').textContent     = user.xp.toLocaleString();
+    if (el('auTracks')) el('auTracks').textContent = user._count?.tracks ?? '—';
+    if (el('auSets'))   el('auSets').textContent   = user._count?.djSets ?? '—';
+    applyUserToUI(user);
+  } catch {}
+}
+
+/* ──────────────────────── SYNC XP TO BACKEND ──────────────────────── */
+// Override the local updateXP to also sync to server when logged in
+const _localUpdateXP = updateXP;
+updateXP = function(n) {
+  _localUpdateXP(n);
+  if (_token) {
+    apiFetch('PATCH', '/users/me/xp', { amount: n }).then(data => {
+      if (data && data.xp !== undefined) {
+        xp = data.xp;
+        const navXP = document.getElementById('navXP');
+        const sbXP  = document.getElementById('sbXP');
+        if (navXP) navXP.textContent = xp.toLocaleString() + ' XP';
+        if (sbXP)  sbXP.textContent  = xp.toLocaleString();
+      }
+    }).catch(() => {});
+  }
+};
+
+/* ──────────────────────── LEADERBOARD FROM API ──────────────────────── */
+async function fetchLeaderboard() {
+  try {
+    const users = await apiFetch('GET', '/users/leaderboard');
+    const lb = document.getElementById('homeLB');
+    if (!lb || !users.length) return;
+    const rk = ['g1','g2','g3','',''];
+    lb.innerHTML = '';
+    users.slice(0,5).forEach((u, i) => {
+      const col = u.role === 'DJ' ? 'var(--g)' : 'var(--p)';
+      lb.innerHTML += `<div class="lbr">
+        <div class="lbr-rank ${rk[i]||''}">#${i+1}</div>
+        <div class="lbr-av" style="background:${col}18;color:${col}">${u.username.charAt(0)}</div>
+        <div class="lbr-info"><strong>${u.username}</strong><small>${u.role.toLowerCase()}</small></div>
+        <div class="lbr-xp" style="color:${col}">${u.xp.toLocaleString()}</div>
+      </div>`;
+    });
+
+    // Also update community feed
+    const cf = document.getElementById('communityFeed');
+    if (cf) {
+      cf.innerHTML = users.slice(0, 10).map(u => {
+        const col = u.role === 'DJ' ? 'var(--g)' : 'var(--p)';
+        return `<div class="fc">
+          <div class="fc-av" style="background:${col}18;color:${col}">${u.username.charAt(0)}</div>
+          <div class="fc-info">
+            <strong>${u.username}</strong>
+            <span class="fc-role" style="color:${col}">${u.role === 'DJ' ? 'Real DJ' : u.role === 'ADMIN' ? 'Admin' : 'Creator'}</span>
+            <div class="fc-bio">${u.bio || '—'}</div>
+            <div class="fc-btns">
+              <button class="btn btn-ghost btn-xs" onclick="syncXP(5)"><i class="fas fa-heart"></i> Vote</button>
+            </div>
+          </div>
+          <div class="fc-xp" style="color:${col}">${u.xp.toLocaleString()} XP</div>
+        </div>`;
+      }).join('');
+    }
+  } catch {}
+}
+
+function syncXP(n) { updateXP(n); toast(`❤️ Voted! +${n} XP`, 'xp'); }
+
+/* ──────────────────────── TRACK UPLOAD TO API ──────────────────────── */
+// Patch loadAudioFile to also upload to backend if logged in
+const _origLoadAudioFile = loadAudioFile;
+loadAudioFile = async function(inp) {
+  await _origLoadAudioFile(inp);
+  if (!_token || !inp.files[0]) return;
+  const file = inp.files[0];
+  const title  = file.name.replace(/\.[^.]+$/, '');
+  const artist = _user?.username || 'Unknown';
+  const fd = new FormData();
+  fd.append('audio',  file);
+  fd.append('title',  title);
+  fd.append('artist', artist);
+  toast('☁️ Uploading track to cloud...', 'info');
+  try {
+    const track = await apiFetch('POST', '/tracks', fd, true);
+    toast(`✅ Track saved to cloud: ${track.title}`, 'xp');
+    // update displayed BPM/key from server response
+    if (track.bpm) {
+      document.getElementById('trackBPMtag').innerText = `${track.bpm} BPM`;
+      document.getElementById('trackInfo').innerText   = `${track.genre} · ${track.bpm} BPM · ${track.musicalKey} (${track.camelot})`;
+    }
+  } catch {}
+};
+
+/* ──────────────────────── BPM ANALYSE — prefer API ──────────────────────── */
+const _origAnalyseTrack = analyseTrack;
+analyseTrack = async function(inp) {
+  if (!inp.files || !inp.files[0]) return;
+  if (!_token) {
+    // fall back to local simulation
+    return _origAnalyseTrack(inp);
+  }
+  toast('🔍 Analysing track via API...', 'info');
+  // Upload file for BPM analysis
+  const fd = new FormData();
+  fd.append('audio',  inp.files[0]);
+  fd.append('title',  inp.files[0].name.replace(/\.[^.]+$/,''));
+  fd.append('artist', _user?.username || 'Unknown');
+  try {
+    const track = await apiFetch('POST', '/tracks', fd, true);
+    showBPMResults(track.bpm, track.musicalKey.split(' ')[0], track.musicalKey.split(' ')[1] || 'major', track.camelot);
+    tracksAnalysed++;
+    updateXP(15);
+    updateStats();
+  } catch {
+    // fallback to local simulation
+    _origAnalyseTrack(inp);
+  }
+};
+
+/* ──────────────────────── DJ SETS — CLOUD SYNC ──────────────────────── */
+async function saveSetToCloud() {
+  if (!_token) { toast('Sign in to save sets to the cloud', 'err'); openAuthModal(); return; }
+  const name = prompt('Set name:', 'My DnB Set') || 'My DnB Set';
+  try {
+    const set = await apiFetch('POST', '/sets', { name, tracks: SET_TRACKS });
+    toast('☁️ Set "' + set.name + '" saved to cloud! +25 XP', 'xp');
+  } catch {}
+}
+
+async function loadSetsFromCloud() {
+  if (!_token) { toast('Sign in to load cloud sets', 'err'); openAuthModal(); return; }
+  try {
+    const sets = await apiFetch('GET', '/sets');
+    if (!sets.length) { toast('No saved sets found', 'info'); return; }
+    // Show picker toast or load first set
+    const latest = sets[0];
+    const tracks = Array.isArray(latest.tracks) ? latest.tracks : JSON.parse(latest.tracks || '[]');
+    SET_TRACKS.length = 0;
+    SET_TRACKS.push(...tracks);
+    renderSet();
+    toast(`📂 Loaded set: "${latest.name}" (${tracks.length} tracks)`, 'info');
+  } catch {}
+}
+
+/* ──────────────────────── INIT — restore session ──────────────────────── */
+(function initSession() {
+  if (_user) applyUserToUI(_user);
+  // Refresh leaderboard from API (non-blocking)
+  setTimeout(fetchLeaderboard, 800);
+  // Verify token still valid
+  if (_token) {
+    apiFetch('GET', '/users/me').then(user => {
+      if (user) setSession(_token, user);
+    }).catch(clearSession);
+  }
+})();
 </script>
 </body>
 </html>
