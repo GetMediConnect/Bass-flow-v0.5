@@ -2,9 +2,10 @@ import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
-import { supabase, BUCKET_AUDIO, BUCKET_COVERS } from '../lib/supabase';
+import { supabase, BUCKET_AUDIO } from '../lib/supabase';
 import { requireAuth, optionalAuth } from '../middleware/auth';
 import { createError } from '../middleware/error';
+import { uploadLimiter } from '../middleware/rateLimiter';
 import { Genre } from '@prisma/client';
 
 export const tracksRouter = Router();
@@ -34,7 +35,15 @@ const CAMELOT: Record<string, string> = {
 const KEYS = Object.keys(CAMELOT);
 
 /** Deterministic BPM estimation from audio ArrayBuffer (PCM zero-crossing rate heuristic).
- *  For production, replace with a proper BPM library or a Python microservice (essentia/librosa). */
+ *
+ * TODO: Replace this stub with a proper BPM detection library such as:
+ *   - essentia.js  (https://essentia.upf.edu/essentia_js)
+ *   - aubio        (via Python microservice)
+ *   - librosa      (via Python microservice)
+ * The current implementation is intentionally simple — it produces a
+ * plausible DnB BPM (160–185) that is consistent for the same file
+ * but is NOT a real BPM analyser.
+ */
 function estimateBPM(buffer: Buffer): number {
   // Sample every 1024 bytes as signed 16-bit PCM to count sign changes
   let crossings = 0;
@@ -69,6 +78,7 @@ const CreateTrackSchema = z.object({
 tracksRouter.post(
   '/',
   requireAuth,
+  uploadLimiter,
   upload.single('audio'),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -266,9 +276,20 @@ tracksRouter.delete(
 
       await prisma.track.delete({ where: { id: track.id } });
 
-      // Best-effort: remove from storage
-      const storagePath = track.audioUrl.split('/').slice(-2).join('/');
-      await supabase.storage.from(BUCKET_AUDIO).remove([storagePath]);
+      // Best-effort: remove from Supabase Storage
+      // Extract the object path from the public URL:
+      //   https://<project>.supabase.co/storage/v1/object/public/<bucket>/<path>
+      try {
+        const parsed = new URL(track.audioUrl);
+        const marker = `/object/public/${BUCKET_AUDIO}/`;
+        const idx    = parsed.pathname.indexOf(marker);
+        if (idx !== -1) {
+          const storagePath = parsed.pathname.slice(idx + marker.length);
+          await supabase.storage.from(BUCKET_AUDIO).remove([storagePath]);
+        }
+      } catch {
+        // non-fatal — file will be cleaned up by storage lifecycle policy
+      }
 
       res.status(204).send();
     } catch (err) {

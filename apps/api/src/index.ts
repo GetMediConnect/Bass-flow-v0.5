@@ -9,6 +9,7 @@ import { usersRouter }  from './routes/users';
 import { tracksRouter } from './routes/tracks';
 import { setsRouter }   from './routes/sets';
 import { errorHandler } from './middleware/error';
+import { apiLimiter, authLimiter } from './middleware/rateLimiter';
 import { prisma }       from './lib/prisma';
 
 const app  = express();
@@ -44,10 +45,10 @@ app.get('/health', (_req, res) => {
 });
 
 // ─── API routes ───────────────────────────────────────────────────────────────
-app.use('/auth',   authRouter);
-app.use('/users',  usersRouter);
-app.use('/tracks', tracksRouter);
-app.use('/sets',   setsRouter);
+app.use('/auth',   authLimiter, authRouter);
+app.use('/users',  apiLimiter,  usersRouter);
+app.use('/tracks', apiLimiter,  tracksRouter);
+app.use('/sets',   apiLimiter,  setsRouter);
 
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((_req, res) => {

@@ -1763,7 +1763,9 @@ function authHeaders() {
 }
 
 async function apiFetch(method, path, body, isForm) {
-  const opts = { method, headers: isForm ? { 'Authorization': _token ? 'Bearer '+_token : '' } : authHeaders() };
+  const formHeaders = {};
+  if (_token) formHeaders['Authorization'] = 'Bearer ' + _token;
+  const opts = { method, headers: isForm ? formHeaders : authHeaders() };
   if (body && !isForm) opts.body = JSON.stringify(body);
   if (body && isForm)  opts.body = body;
   try {
@@ -1891,12 +1893,21 @@ async function refreshAuthUser() {
 }
 
 /* ──────────────────────── SYNC XP TO BACKEND ──────────────────────── */
-// Override the local updateXP to also sync to server when logged in
+// Override the local updateXP to also sync to server when logged in.
+// XP updates are debounced (500ms) and accumulated to avoid race conditions
+// from rapid successive tool actions.
 const _localUpdateXP = updateXP;
+let _xpQueue = 0;
+let _xpTimer = null;
 updateXP = function(n) {
   _localUpdateXP(n);
-  if (_token) {
-    apiFetch('PATCH', '/users/me/xp', { amount: n }).then(data => {
+  if (!_token) return;
+  _xpQueue += n;
+  clearTimeout(_xpTimer);
+  _xpTimer = setTimeout(() => {
+    const amount = _xpQueue;
+    _xpQueue = 0;
+    apiFetch('PATCH', '/users/me/xp', { amount }).then(data => {
       if (data && data.xp !== undefined) {
         xp = data.xp;
         const navXP = document.getElementById('navXP');
@@ -1905,7 +1916,7 @@ updateXP = function(n) {
         if (sbXP)  sbXP.textContent  = xp.toLocaleString();
       }
     }).catch(() => {});
-  }
+  }, 500);
 };
 
 /* ──────────────────────── LEADERBOARD FROM API ──────────────────────── */
@@ -1970,7 +1981,9 @@ loadAudioFile = async function(inp) {
     // update displayed BPM/key from server response
     if (track.bpm) {
       document.getElementById('trackBPMtag').innerText = `${track.bpm} BPM`;
-      document.getElementById('trackInfo').innerText   = `${track.genre} · ${track.bpm} BPM · ${track.musicalKey} (${track.camelot})`;
+      document.getElementById('trackInfo').innerText   = track.musicalKey
+        ? `${track.genre} · ${track.bpm} BPM · ${track.musicalKey} (${track.camelot})`
+        : `${track.genre} · ${track.bpm} BPM`;
     }
   } catch {}
 };
@@ -1991,7 +2004,9 @@ analyseTrack = async function(inp) {
   fd.append('artist', _user?.username || 'Unknown');
   try {
     const track = await apiFetch('POST', '/tracks', fd, true);
-    showBPMResults(track.bpm, track.musicalKey.split(' ')[0], track.musicalKey.split(' ')[1] || 'major', track.camelot);
+    const keyStr = track.musicalKey || '';
+    const keyParts = keyStr.split(' ');
+    showBPMResults(track.bpm, keyParts[0] || '—', keyParts[1] || 'major', track.camelot || '—');
     tracksAnalysed++;
     updateXP(15);
     updateStats();
