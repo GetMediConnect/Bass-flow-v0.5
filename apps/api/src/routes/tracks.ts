@@ -18,7 +18,8 @@ const upload = multer({
     if (file.mimetype.startsWith('audio/') || file.mimetype === 'application/octet-stream') {
       cb(null, true);
     } else {
-      cb(new Error('Only audio files are accepted'));
+      // multer 2.x: pass an Error to reject with a message
+      cb(Object.assign(new Error('Only audio files are accepted'), { code: 'INVALID_FILE_TYPE' }));
     }
   },
 });
