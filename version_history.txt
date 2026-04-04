@@ -1,0 +1,63 @@
+BassFlow — Version History
+==========================
+
+v1 / index.html + js/app.js + css/styles.css
+  Static landing page (marketing site) with animated canvas visualizer,
+  mock track/DJ/event data, audio player bar, genre filter tabs, modal for
+  Join/Upload. Stack: vanilla HTML + CSS + JS only.
+
+v2 / bassflow_v2.html
+  Full marketing SPA with hero section, pitch deck, market research cards,
+  features grid, AI workspace preview, and three-tier pricing (Free/Creator/Pro).
+  First version to include the AI workspace concept and Suno Prompt Builder.
+  Design: cyberpunk dark with neon green (#00ff9d) / purple / cyan palette.
+
+v3 / bassflow_v3.html
+  Switched from marketing page to full-app dashboard layout (sidebar + main panel).
+  Sections: Dashboard, Upload/Share, Live Chat, Marketplace, Events, Community,
+  Live Radio (BassFlow 24/7), AI Workspace, Analytics, Profile.
+  Introduced real-time community chat mockup and leaderboard system.
+
+v4 / bassflow_v4.html
+  Added multi-step onboarding wizard (account type → details → profile → connect),
+  social login buttons (Facebook, TikTok, Instagram), Discord integration panel,
+  Music Forum section, Developer REST API documentation (v2), 3rd-party
+  integrations (SoundCloud, Spotify, YouTube, TikTok, Beatport), and full
+  pricing tiers with feature gating.
+
+v5 / bassflow_v5.html
+  "AI Tools Suite" release — 8 new tools added:
+  · Web Audio Player (Web Audio API, canvas waveform, spectrum analyser, EQ/FX)
+  · BPM + Key Detector (beat-flash, Camelot Wheel mapping)
+  · Stem Separator (bass/drums/melody/vocals isolation UI)
+  · AI Mastering — DnB Mode (8-band EQ, genre presets, LUFS metering)
+  · Cover Art Generator (canvas-rendered cyberpunk art, multiple styles)
+  · AI Set Planner (key compatibility, energy arc, transition scoring)
+  · Suno Prompt Builder (Suno v4/v4.5 metatag prompts)
+  · Lyric Generator (EN/PL, MC chants, atmospheric/hype styles)
+  Also included: Voice Clone MC Tool (Beta placeholder) and VR Event Builder
+  (Experimental placeholder). XP gamification system.
+
+mad_audio_master.html
+  Standalone audio mastering + social media video generation tool.
+  4-panel workflow: load MP3, load visual media, audio mastering settings,
+  generate social media video. Separate utility, not part of main app flow.
+
+basswave.html
+  Alternate brand prototype ("BassWave") — different color scheme, early
+  exploration of the platform concept before settling on BassFlow branding.
+
+v6 / bassflow_v6.html  [CURRENT]
+  Comprehensive PWA combining all features from v1–v5:
+  · Full backend integration (Express API + SQLite database)
+  · Multi-step authentication & onboarding
+  · All 11 AI tools (Web Audio Player, BPM/Key, Stems, Mastering, Cover Art,
+    Set Planner, Suno Prompt, Lyrics, Mix Description, Voice Clone, VR Builder)
+  · Tracks/DJs/Events/Mixes browser with live API data
+  · Community feed + global leaderboard
+  · Live radio player
+  · Analytics dashboard
+  · Marketplace
+  · Developer API documentation
+  · PWA manifest + service worker (offline support)
+  · XP gamification + achievements
