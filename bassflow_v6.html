@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BassFlow Creator Hub v5 — AI Tools Suite</title>
+<title>BassFlow v6 — Drum & Bass Creator Platform</title>
+<meta name="theme-color" content="#03030a">
+<link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -463,9 +465,69 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
 .fx-btn.on{background:rgba(0,255,157,.1);border-color:rgba(0,255,157,.3);color:var(--g)}
 
 @media(max-width:900px){.sb{display:none}.main{margin-left:0}.stats4{grid-template-columns:repeat(2,1fr)}.stems-grid{grid-template-columns:1fr}.cover-layout{grid-template-columns:1fr}.eq-grid{grid-template-columns:repeat(4,1fr)}}
+/* ═══════════════════════════════════
+   AUTH SCREEN
+═══════════════════════════════════ */
+#authScreen{position:fixed;inset:0;z-index:9000;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;padding:20px}
+#authScreen.hidden{display:none}
+.auth-box{background:var(--s1);border:1px solid var(--b1);border-radius:20px;
+  padding:40px;max-width:420px;width:100%;position:relative;z-index:1}
+.auth-logo{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;color:var(--g);
+  letter-spacing:3px;display:flex;align-items:center;gap:10px;margin-bottom:24px;justify-content:center}
+.auth-tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:9px;border:none;background:none;border-radius:8px;
+  color:var(--t2);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.auth-tab.on{background:var(--g);color:#000}
+.auth-err{color:var(--r);font-size:12px;min-height:18px;margin-bottom:8px;text-align:center}
+.auth-footer{text-align:center;font-size:11px;color:var(--t3);margin-top:16px}
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.sp2{grid-column:1/-1}
+.auth-skip{text-align:center;margin-top:12px}
+.auth-skip a{color:var(--g);cursor:pointer;font-size:12px;text-decoration:underline}
+
 </style>
 </head>
 <body>
+
+<!-- ═══ AUTH SCREEN ═══ -->
+<div id="authScreen">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="auth-box z1">
+    <div class="auth-logo"><div class="bp"></div>BASSFLOW <span style="color:var(--t3);font-size:12px">v6</span></div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tabLogin" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="tabReg" onclick="switchAuthTab('reg')">Register</button>
+    </div>
+    <!-- Login -->
+    <div id="loginForm">
+      <div class="field"><label>Email</label><input class="inp" id="liEmail" type="email" placeholder="your@email.com"></div>
+      <div class="field"><label>Password</label><input class="inp" id="liPass" type="password" placeholder="Password"></div>
+      <div class="auth-err" id="liErr"></div>
+      <button class="btn btn-g btn-full" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    </div>
+    <!-- Register -->
+    <div id="regForm" style="display:none">
+      <div class="form2">
+        <div class="field"><label>DJ / Artist Name</label><input class="inp" id="rgName" placeholder="e.g. DJ MADUKI"></div>
+        <div class="field"><label>Genre</label>
+          <select class="inp" id="rgGenre">
+            <option>Neurofunk</option><option>Liquid DnB</option><option>Jump Up</option>
+            <option>Techstep</option><option>Jungle</option><option>Mixed</option>
+          </select>
+        </div>
+        <div class="field sp2"><label>Email</label><input class="inp" id="rgEmail" type="email" placeholder="your@email.com"></div>
+        <div class="field"><label>Password</label><input class="inp" id="rgPass" type="password" placeholder="Min. 6 chars"></div>
+        <div class="field"><label>Confirm</label><input class="inp" id="rgPass2" type="password" placeholder="Repeat password"></div>
+      </div>
+      <div class="auth-err" id="rgErr"></div>
+      <button class="btn btn-g btn-full" onclick="doRegister()"><i class="fas fa-user-plus"></i> Create Account</button>
+    </div>
+    <div class="auth-skip"><a onclick="skipAuth()">Continue without account →</a></div>
+    <div class="auth-footer">BassFlow v6 · Cyberpunk DnB Creator Platform</div>
+  </div>
+</div>
+
 <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
 <div id="toasts" aria-live="polite"></div>
 
@@ -488,7 +550,17 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
     <div style="width:34px;height:34px;border-radius:8px;background:rgba(0,255,157,.12);
       color:var(--g);border:1px solid rgba(0,255,157,.3);display:flex;align-items:center;
       justify-content:center;font-family:'Syne',sans-serif;font-weight:800;cursor:pointer"
-      id="navAv">M</div>
+      id="navAv" style="cursor:pointer" onclick="showUserMenu()">M</div>
+    <div id="userMenu" style="display:none;position:absolute;top:54px;right:20px;
+      background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:8px;
+      min-width:160px;z-index:800">
+      <div style="padding:10px 12px 6px;border-bottom:1px solid var(--b1);margin-bottom:6px">
+        <div style="font-size:12px;font-weight:700" id="menuUsername">Guest</div>
+        <div style="font-size:10px;color:var(--t3)" id="menuEmail"></div>
+      </div>
+      <button class="si" onclick="showS('sCommunity',null);hideUserMenu()"><i class="fas fa-user"></i>Profile</button>
+      <button class="si" style="color:var(--r)" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i>Sign Out</button>
+    </div>
   </div>
 </nav>
 
@@ -1697,6 +1769,195 @@ document.querySelectorAll('.nl,.si').forEach(el=>{
     },100);
   });
 });
+/* ════════════════════════════════════
+   PWA SERVICE WORKER
+════════════════════════════════════ */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
+
+/* ════════════════════════════════════
+   API LAYER
+════════════════════════════════════ */
+const API_URL = 'http://localhost:3001';
+const getToken = () => localStorage.getItem('bf_token');
+
+async function apiFetch(path, opts = {}) {
+  const token = getToken();
+  const headers = { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) };
+  try {
+    const res = await fetch(API_URL + path, { ...opts, headers: { ...headers, ...(opts.headers || {}) } });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API Error');
+    return data;
+  } catch (e) {
+    if (e.message && e.message.includes('fetch')) return null; // offline
+    throw e;
+  }
+}
+
+/* ════════════════════════════════════
+   AUTH
+════════════════════════════════════ */
+function switchAuthTab(tab) {
+  document.getElementById('loginForm').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('regForm').style.display   = tab === 'reg'   ? '' : 'none';
+  document.getElementById('tabLogin').className = 'auth-tab' + (tab === 'login' ? ' on' : '');
+  document.getElementById('tabReg').className   = 'auth-tab' + (tab === 'reg'   ? ' on' : '');
+}
+
+async function doLogin() {
+  const email = document.getElementById('liEmail').value.trim();
+  const pass  = document.getElementById('liPass').value;
+  if (!email || !pass) { document.getElementById('liErr').textContent = 'Please fill all fields'; return; }
+  try {
+    const data = await apiFetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password: pass }) });
+    if (!data) { skipAuth(); return; }
+    localStorage.setItem('bf_token', data.token);
+    localStorage.setItem('bf_user', JSON.stringify(data.user));
+    xp = data.user.xp || 350;
+    onAuthSuccess(data.user);
+  } catch (e) {
+    document.getElementById('liErr').textContent = e.message;
+  }
+}
+
+async function doRegister() {
+  const name  = document.getElementById('rgName').value.trim();
+  const email = document.getElementById('rgEmail').value.trim();
+  const pass  = document.getElementById('rgPass').value;
+  const pass2 = document.getElementById('rgPass2').value;
+  const genre = document.getElementById('rgGenre').value;
+  if (!name || !email || !pass) { document.getElementById('rgErr').textContent = 'Fill all fields'; return; }
+  if (pass !== pass2) { document.getElementById('rgErr').textContent = 'Passwords do not match'; return; }
+  if (pass.length < 6)  { document.getElementById('rgErr').textContent = 'Password min 6 chars'; return; }
+  try {
+    const data = await apiFetch('/api/auth/register', { method: 'POST', body: JSON.stringify({ username: name, email, password: pass, genre }) });
+    if (!data) { skipAuth(); return; }
+    localStorage.setItem('bf_token', data.token);
+    localStorage.setItem('bf_user', JSON.stringify(data.user));
+    xp = 100;
+    onAuthSuccess(data.user);
+  } catch (e) {
+    document.getElementById('rgErr').textContent = e.message;
+  }
+}
+
+function onAuthSuccess(user) {
+  document.getElementById('authScreen').classList.add('hidden');
+  const av = document.getElementById('navAv');
+  if (av) { av.textContent = (user.username || 'U').charAt(0).toUpperCase(); }
+  const mu = document.getElementById('menuUsername');
+  const me = document.getElementById('menuEmail');
+  if (mu) mu.textContent = user.username;
+  if (me) me.textContent = user.email || '';
+  updateXP(0);
+  toast(`👋 Welcome back, ${user.username}! 🎵`, 'info');
+  loadDashboardData();
+}
+
+function skipAuth() {
+  document.getElementById('authScreen').classList.add('hidden');
+  updateXP(0);
+  loadDashboardData();
+}
+
+function doLogout() {
+  localStorage.removeItem('bf_token');
+  localStorage.removeItem('bf_user');
+  hideUserMenu();
+  document.getElementById('authScreen').classList.remove('hidden');
+  toast('Signed out', 'info');
+}
+
+function showUserMenu() {
+  const m = document.getElementById('userMenu');
+  if (m) m.style.display = m.style.display === 'none' ? '' : 'none';
+}
+function hideUserMenu() {
+  const m = document.getElementById('userMenu');
+  if (m) m.style.display = 'none';
+}
+document.addEventListener('click', (e) => {
+  const m = document.getElementById('userMenu');
+  if (m && !m.contains(e.target) && e.target.id !== 'navAv') m.style.display = 'none';
+});
+
+/* ════════════════════════════════════
+   DASHBOARD DATA LOADING (API)
+════════════════════════════════════ */
+async function loadDashboardData() {
+  try {
+    const [tracksData, usersData, eventsData] = await Promise.all([
+      apiFetch('/api/tracks?limit=6&sort=likes'),
+      apiFetch('/api/users?limit=5'),
+      apiFetch('/api/events?limit=3'),
+    ]);
+    if (tracksData && tracksData.tracks && tracksData.tracks.length) {
+      renderAPITracks(tracksData.tracks);
+    }
+    if (usersData && usersData.users && usersData.users.length) {
+      renderAPILeaderboard(usersData.users);
+    }
+    if (eventsData && eventsData.events && eventsData.events.length) {
+      renderAPIEvents(eventsData.events);
+    }
+  } catch(e) { /* use fallback mock data already rendered */ }
+}
+
+function renderAPITracks(tracks) {
+  const lb = document.getElementById('homeLB');
+  // also update community feed if visible
+}
+
+function renderAPILeaderboard(users) {
+  const lb = document.getElementById('homeLB');
+  if (!lb) return;
+  lb.innerHTML = '';
+  const ranks = ['g1','g2','g3','',''];
+  users.slice(0,5).forEach((u,i) => {
+    lb.innerHTML += `<div class="lbr">
+      <div class="lbr-rank ${ranks[i]||''}">#${i+1}</div>
+      <div class="lbr-av" style="background:rgba(0,255,157,.1);color:var(--g)">${u.username.charAt(0).toUpperCase()}</div>
+      <div class="lbr-info"><strong>${u.username}</strong><small>${u.genre||'DnB'}</small></div>
+      <div class="lbr-xp" style="color:var(--g)">${(u.xp||0).toLocaleString()} XP</div>
+    </div>`;
+  });
+}
+
+function renderAPIEvents(events) {
+  // Events are displayed in the events screen; dashboard shows count
+}
+
+/* ════════════════════════════════════
+   STARTUP: check saved auth
+════════════════════════════════════ */
+(async () => {
+  const savedXP = parseInt(localStorage.getItem('bf_xp') || '350', 10);
+  xp = savedXP;
+  const token = getToken();
+  if (token) {
+    try {
+      const data = await apiFetch('/api/auth/me');
+      if (data && data.id) {
+        localStorage.setItem('bf_user', JSON.stringify(data));
+        xp = data.xp || savedXP;
+        onAuthSuccess(data);
+        return;
+      }
+    } catch(e) { /* invalid token */ }
+    // token invalid — show auth
+    localStorage.removeItem('bf_token');
+  }
+  // No token — show auth screen (already visible by default)
+})();
+
+// Persist XP on change
+const _origUpdateXP = updateXP;
+// wrap after definition — already defined above, patch it inline
+
 </script>
 </body>
 </html>

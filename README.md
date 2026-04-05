@@ -1,154 +1,97 @@
-# 🎛️ BassWave
+# 🎵 BassFlow v6 — Drum & Bass Creator Platform
 
-Platforma społecznościowa dla Drum & Bass — upload, odkrywaj, komentuj.
+> Cyberpunk-styled, AI-powered platform for DJs, producers and DnB music lovers worldwide.
 
-## Stack
+## 🚀 Quick Start
 
-| Warstwa | Technologia |
-|---------|-------------|
-| Frontend | React 18 + Vite + TypeScript |
-| State | Zustand (player + auth) |
-| Data fetching | TanStack Query |
-| Backend | Node.js + Express + TypeScript |
-| Baza danych | PostgreSQL via Prisma ORM |
-| Storage | Supabase Storage (audio + covers) |
-| Auth | Supabase Auth + JWT |
-| Hosting | Google Cloud Run |
-
----
-
-## 🚀 Szybki start (lokalne dev)
-
-### 1. Supabase (5 minut, bezpłatnie)
-
-1. Wejdź na [supabase.com](https://supabase.com) → **New project**
-2. Skopiuj z **Settings → Database → Connection string** → `DATABASE_URL` i `DIRECT_URL`
-3. Skopiuj z **Settings → API** → `SUPABASE_URL` i `service_role` key
-4. W **Storage** utwórz 2 buckety:
-   - `tracks-audio` (Public: ✅)
-   - `tracks-covers` (Public: ✅)
-
-### 2. Konfiguracja środowiska
-
+### Frontend (static — open directly in browser)
 ```bash
-cp apps/api/.env.example apps/api/.env
-# Uzupełnij DATABASE_URL, DIRECT_URL, SUPABASE_URL, SUPABASE_SERVICE_KEY, JWT_SECRET
+open bassflow_v6.html
 ```
 
-Wygeneruj JWT_SECRET:
+### Backend API (Express + SQLite)
 ```bash
-node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-```
-
-### 3. Instalacja i migracja DB
-
-```bash
+cd api
 npm install
-npm run db:migrate        # tworzy tabele
-npm run db:seed -w apps/api   # opcjonalnie – sample data
+npm start
+# → http://localhost:3001
 ```
 
-### 4. Uruchom
+The frontend automatically calls `http://localhost:3001` for live data. Falls back to mock data when the API is offline.
 
-```bash
-npm run dev               # API :3001 + Web :5173 równocześnie
-# lub oddzielnie:
-npm run dev:api
-npm run dev:web
+## �� Project Structure
+
+```
+Bass-flow-v0.5/
+├── bassflow_v6.html      ← Main PWA (single-file app)
+├── index.html            ← Redirects to v6
+├── manifest.json         ← PWA manifest
+├── sw.js                 ← Service Worker (offline support)
+├── api/
+│   ├── server.js         ← Express server (port 3001)
+│   ├── db.js             ← SQLite schema + seed data
+│   ├── middleware/
+│   │   └── auth.js       ← JWT middleware
+│   └── routes/
+│       ├── auth.js       ← POST /register, POST /login, GET /me
+│       ├── tracks.js     ← CRUD + likes + comments + play count
+│       ├── users.js      ← Profiles + follow/unfollow
+│       ├── events.js     ← Events CRUD
+│       └── mixes.js      ← Mixes CRUD
+├── css/styles.css        ← Legacy CSS (v1 only)
+├── js/app.js             ← Legacy JS (v1 only)
+├── docs/
+│   └── business/         ← All business PDFs / contracts
+└── version_history.txt   ← Full changelog v1→v6
 ```
 
-Otwórz: http://localhost:5173
+## 🔑 API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/auth/register` | — | Create account → JWT |
+| POST | `/api/auth/login` | — | Sign in → JWT |
+| GET | `/api/auth/me` | ✅ | Current user |
+| GET | `/api/tracks` | opt | List tracks (genre, q, sort) |
+| POST | `/api/tracks` | ✅ | Upload track |
+| POST | `/api/tracks/:id/like` | ✅ | Toggle like |
+| POST | `/api/tracks/:id/comments` | ✅ | Add comment |
+| GET | `/api/users` | — | Leaderboard |
+| POST | `/api/users/:id/follow` | ✅ | Toggle follow |
+| GET | `/api/events` | — | Upcoming events |
+| GET | `/api/mixes` | — | Mixes list |
+| GET | `/api/health` | — | Health check |
+
+## 🛠️ AI Tools (11 total)
+
+1. **Web Audio Player** — WAV/MP3/FLAC player with canvas waveform + spectrum analyser + 8-band EQ
+2. **BPM + Key Detector** — Beat detection with Camelot Wheel mapping
+3. **Stem Separator** — Bass / Drums / Melody / Vocals isolation UI
+4. **AI Mastering** — 8-band EQ with genre presets (Neurofunk, Liquid, Jump Up…)
+5. **Cover Art Generator** — Canvas-rendered cyberpunk artwork (4 styles)
+6. **AI Set Planner** — Key compatibility + energy arc + transition scoring
+7. **Suno Prompt Builder** — Suno v4.5 metatag prompts
+8. **Lyric Generator** — EN/PL MC chants & drops
+9. **Mix Description** — SoundCloud/Mixcloud copy generator
+10. **Voice Clone MC** *(Beta placeholder)*
+11. **VR Event Builder** *(Experimental placeholder)*
+
+## 📱 PWA
+
+- Installable on Android, iOS, desktop Chrome
+- Offline shell caching via Service Worker
+- Manifest with theme colour and icons
+
+## 🗄️ Database (SQLite)
+
+Tables: `users`, `tracks`, `mixes`, `events`, `likes`, `follows`, `comments`
+
+Seeded with 8 DJ profiles, 16 tracks, 8 mixes, 8 upcoming events.
+
+## Version History
+
+See [`version_history.txt`](version_history.txt) for full changelog (v1 → v6).
 
 ---
 
-## 🐳 Docker (lokalny pełny stack)
-
-```bash
-cp apps/api/.env.example .env   # uzupełnij zmienne Supabase
-docker-compose up --build
-```
-
-Web: http://localhost:8080 | API: http://localhost:3001
-
----
-
-## ☁️ Deploy na Google Cloud Run
-
-```bash
-chmod +x deploy.sh
-
-# Eksportuj zmienne
-export DATABASE_URL="..."
-export DIRECT_URL="..."
-export SUPABASE_URL="..."
-export SUPABASE_SERVICE_KEY="..."
-export JWT_SECRET="..."
-
-# Deploy API + Web
-./deploy.sh all
-
-# Lub oddzielnie
-./deploy.sh api
-./deploy.sh web
-```
-
-Projekt GCP: `gen-lang-client-0354485869` | Region: `europe-west1`
-
----
-
-## 📁 Struktura projektu
-
-```
-basswave/
-├── apps/
-│   ├── api/                    Node.js + Express API
-│   │   ├── prisma/schema.prisma   Modele DB
-│   │   └── src/
-│   │       ├── routes/            auth / tracks / users / uploads
-│   │       ├── middleware/        JWT auth + error handler
-│   │       └── lib/               Prisma + Supabase klienty
-│   └── web/                    React + Vite frontend
-│       └── src/
-│           ├── components/        PlayerBar, TrackCard, WaveformCanvas
-│           ├── pages/             Home, Discover, Track, Artist, Upload, Auth
-│           ├── hooks/             useAudioPlayer (Web Audio API)
-│           └── lib/               api.ts, playerStore, authStore
-├── docker-compose.yml
-├── deploy.sh                   Cloud Run deploy script
-└── package.json                Monorepo root
-```
-
----
-
-## 🔌 API Endpoints
-
-```
-POST /api/auth/register         Rejestracja
-POST /api/auth/login            Logowanie
-
-GET  /api/tracks                Lista (filtr: genre, country, q)
-GET  /api/tracks/:id            Szczegóły tracku
-POST /api/tracks                Utwórz track [auth]
-DELETE /api/tracks/:id          Usuń [auth + owner]
-POST /api/tracks/:id/like       Toggle lajk [auth]
-POST /api/tracks/:id/comments   Dodaj komentarz [auth]
-
-GET  /api/users/:username       Profil artysty
-GET  /api/users/me/profile      Mój profil [auth]
-POST /api/users/:id/follow      Toggle follow [auth]
-
-POST /api/uploads/audio         Upload MP3/WAV → Supabase [auth]
-POST /api/uploads/cover         Upload JPG/PNG → Supabase [auth]
-```
-
----
-
-## 🎯 Następne kroki
-
-- [ ] Real-time komentarze (Supabase Realtime)
-- [ ] BPM detection w przeglądarce (essentia.js-wasm)
-- [ ] Strona labelu
-- [ ] System powiadomień
-- [ ] Panel analityki dla artystów
-- [ ] Mobile app (React Native)
-- [ ] Domena basswave.io 👀
+*BassFlow v6 · Built with Express + SQLite + Web Audio API · © MAD Developer Solutions UK*
