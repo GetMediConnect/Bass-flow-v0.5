@@ -6,6 +6,16 @@
 <title>BassFlow v6 — Drum & Bass Creator Platform</title>
 <meta name="theme-color" content="#03030a">
 <link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BassFlow">
+<meta name="application-name" content="BassFlow">
+<meta name="msapplication-TileColor" content="#03030a">
+<meta name="msapplication-navbutton-color" content="#00ff9d">
+<meta name="msapplication-starturl" content="/">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2303030a'/%3E%3Ccircle cx='90' cy='90' r='65' fill='none' stroke='%2300ff9d' stroke-width='5' opacity='.4'/%3E%3Ctext x='90' y='112' text-anchor='middle' font-size='68' fill='%2300ff9d' font-family='sans-serif'%3E%F0%9F%8E%B5%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-startup-image" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1024 1366'%3E%3Crect width='1024' height='1366' fill='%2303030a'/%3E%3Ctext x='512' y='700' text-anchor='middle' font-size='120' fill='%2300ff9d' font-family='sans-serif'%3E%F0%9F%8E%B5 BassFlow%3C/text%3E%3C/svg%3E" media="(device-width: 768px) and (device-height: 1024px)">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -588,6 +598,55 @@ input[type=range].cf-slider{writing-mode:vertical-lr;direction:rtl;
 <body>
 
 <!-- ═══ AUTH SCREEN ═══ -->
+
+<!-- ═══ iOS INSTALL MODAL ═══ -->
+<div id="iosModal" style="display:none;position:fixed;inset:0;z-index:9100;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;padding:0 12px 12px">
+  <div style="background:var(--s1);border:1px solid var(--b1);border-radius:20px;
+    padding:28px;width:100%;max-width:440px;animation:fadeUp .3s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:17px">
+        Install on iPhone / iPad</div>
+      <button onclick="closeIosModal()" style="background:none;border:none;color:var(--t3);
+        cursor:pointer;font-size:20px">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:center;gap:14px;padding:14px;
+        background:var(--s2);border-radius:12px">
+        <div style="width:36px;height:36px;background:rgba(34,211,238,.1);border-radius:8px;
+          display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">1</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">Tap the Share button</div>
+          <div style="font-size:12px;color:var(--t3)">Find the <strong style="color:var(--b)">⬆ Share</strong> icon at the bottom of Safari (or top in some versions)</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px;
+        background:var(--s2);border-radius:12px">
+        <div style="width:36px;height:36px;background:rgba(0,255,157,.1);border-radius:8px;
+          display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">2</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">Tap "Add to Home Screen"</div>
+          <div style="font-size:12px;color:var(--t3)">Scroll down in the share sheet and tap <strong style="color:var(--g)">＋ Add to Home Screen</strong></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px;
+        background:var(--s2);border-radius:12px">
+        <div style="width:36px;height:36px;background:rgba(168,85,247,.1);border-radius:8px;
+          display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">3</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">Tap "Add"</div>
+          <div style="font-size:12px;color:var(--t3)">Confirm by tapping <strong style="color:var(--p)">Add</strong> in the top-right corner</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:12px;background:rgba(0,255,157,.05);border-radius:10px;
+      border:1px solid rgba(0,255,157,.1);font-size:11px;color:var(--t2);text-align:center">
+      🎵 BassFlow will appear on your Home Screen and work offline
+    </div>
+  </div>
+</div>
+
 <div id="authScreen">
   <div class="orb o1"></div><div class="orb o2"></div>
   <div class="auth-box z1">
@@ -646,7 +705,14 @@ input[type=range].cf-slider{writing-mode:vertical-lr;direction:rtl;
     <a class="nl" onclick="showS('sPricing',this)">Pricing AI</a>
   </div>
   <div class="nav-r">
-    <div class="nav-xp" id="navXP">0 XP</div>
+    <button id="installBtn" onclick="triggerInstall()"
+    style="display:none;padding:6px 13px;border-radius:8px;border:1px solid rgba(0,255,157,.4);
+    background:rgba(0,255,157,.08);color:var(--g);font-family:'Syne',sans-serif;font-size:11px;
+    font-weight:700;cursor:pointer;gap:6px;align-items:center;letter-spacing:.5px;transition:all .2s"
+    title="Install BassFlow App">
+  <i class="fas fa-download"></i> Install
+</button>
+<div class="nav-xp" id="navXP">0 XP</div>
     <div style="width:34px;height:34px;border-radius:8px;background:rgba(0,255,157,.12);
       color:var(--g);border:1px solid rgba(0,255,157,.3);display:flex;align-items:center;
       justify-content:center;font-family:'Syne',sans-serif;font-weight:800;cursor:pointer"
@@ -686,6 +752,7 @@ input[type=range].cf-slider{writing-mode:vertical-lr;direction:rtl;
     </div>
     <div class="sb-sec">
       <span class="sb-lbl">Classic Tools</span>
+      <button class="si" onclick="showS('sInstall',this)"><i class="fas fa-download"></i>Install App<span class="sb-badge b">PWA</span></button>
       <button class="si" onclick="showS('sVirtualDJ',this)"><i class="fas fa-headphones"></i>Virtual DJ<span class="sb-badge r">NEW</span></button>
       <button class="si" onclick="showS('sLoopMachine',this)"><i class="fas fa-drum"></i>Loop Machine<span class="sb-badge y">NEW</span></button>
       <button class="si" onclick="showS('sPricing',this)"><i class="fas fa-robot"></i>AI Pricing<span class="sb-badge p">AI</span></button>
@@ -1342,7 +1409,166 @@ input[type=range].cf-slider{writing-mode:vertical-lr;direction:rtl;
       </div>
     </div>
 
+
+    <!-- ═══ INSTALL SCREEN ═══ -->
+    <div class="screen" id="sInstall">
+      <div class="ph"><h2>📲 Install BassFlow</h2><p>Add to your device — works offline, no App Store needed</p></div>
+
+      <!-- Install CTA -->
+      <div style="background:linear-gradient(135deg,rgba(0,255,157,.08),rgba(34,211,238,.05));
+        border:1px solid rgba(0,255,157,.2);border-radius:18px;padding:32px;
+        text-align:center;margin-bottom:24px;position:relative;overflow:hidden">
+        <div style="font-size:56px;margin-bottom:16px">🎵</div>
+        <h3 style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px">
+          Install BassFlow on This Device</h3>
+        <p style="color:var(--t2);font-size:14px;max-width:420px;margin:0 auto 24px">
+          Get the full app experience — works offline, instant load, home screen icon, push notifications.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button id="installBtnMain" onclick="triggerInstall()"
+            style="padding:13px 28px;border-radius:11px;background:var(--g);color:#000;
+            border:none;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;
+            display:inline-flex;align-items:center;gap:8px">
+            <i class="fas fa-download"></i> Install Now (Android / Desktop)
+          </button>
+          <button onclick="showIosModal()"
+            style="padding:13px 28px;border-radius:11px;border:1px solid var(--b2);
+            background:transparent;color:var(--b);font-family:'Syne',sans-serif;
+            font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px">
+            <i class="fab fa-apple"></i> iPhone / iPad
+          </button>
+        </div>
+        <div id="installStatus" style="margin-top:16px;font-size:12px;color:var(--t3)">
+          Detecting your platform…
+        </div>
+      </div>
+
+      <!-- Platform guides grid -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px">
+
+        <!-- Android Chrome -->
+        <div class="tc" style="cursor:default">
+          <div class="tc-icon" style="background:rgba(0,255,157,.1);color:var(--g)">
+            <i class="fab fa-android"></i></div>
+          <h3>Android (Chrome)</h3>
+          <ol style="font-size:12px;color:var(--t2);padding-left:18px;line-height:2">
+            <li>Open this page in <strong style="color:var(--t1)">Chrome</strong></li>
+            <li>Tap <strong style="color:var(--g)">⋮ Menu → Add to Home Screen</strong></li>
+            <li>Or tap the <strong style="color:var(--g)">Install</strong> button above</li>
+          </ol>
+          <div class="tag" style="margin-top:8px">Recommended</div>
+        </div>
+
+        <!-- iOS Safari -->
+        <div class="tc p" style="cursor:default">
+          <div class="tc-icon p"><i class="fab fa-apple"></i></div>
+          <h3>iPhone / iPad</h3>
+          <ol style="font-size:12px;color:var(--t2);padding-left:18px;line-height:2">
+            <li>Open this page in <strong style="color:var(--t1)">Safari</strong></li>
+            <li>Tap the <strong style="color:var(--b)">⬆ Share</strong> button</li>
+            <li>Tap <strong style="color:var(--g)">＋ Add to Home Screen</strong></li>
+          </ol>
+          <button onclick="showIosModal()" class="btn btn-b btn-sm" style="margin-top:10px">
+            <i class="fas fa-info-circle"></i> Step-by-step guide
+          </button>
+        </div>
+
+        <!-- Desktop Chrome/Edge -->
+        <div class="tc b" style="cursor:default">
+          <div class="tc-icon b"><i class="fas fa-desktop"></i></div>
+          <h3>Desktop (Chrome / Edge)</h3>
+          <ol style="font-size:12px;color:var(--t2);padding-left:18px;line-height:2">
+            <li>Look for the <strong style="color:var(--b)">⊕ install icon</strong> in the address bar</li>
+            <li>Or click <strong style="color:var(--b)">Install</strong> in the menu bar above</li>
+            <li>Click <strong style="color:var(--g)">Install</strong> in the dialog</li>
+          </ol>
+          <div class="tag b" style="margin-top:8px">Windows / Mac / Linux</div>
+        </div>
+
+        <!-- Samsung Internet -->
+        <div class="tc y" style="cursor:default">
+          <div class="tc-icon y" style="background:rgba(251,191,36,.1);color:var(--y);border-color:rgba(251,191,36,.2)">
+            <i class="fas fa-mobile-screen"></i></div>
+          <h3>Samsung Internet</h3>
+          <ol style="font-size:12px;color:var(--t2);padding-left:18px;line-height:2">
+            <li>Open in <strong style="color:var(--t1)">Samsung Internet</strong></li>
+            <li>Tap <strong style="color:var(--y)">☰ Menu → Add page to → Home screen</strong></li>
+            <li>Confirm with <strong style="color:var(--g)">Add</strong></li>
+          </ol>
+          <div class="tag y" style="border-color:rgba(251,191,36,.3);color:var(--y);background:rgba(251,191,36,.06);margin-top:8px">Galaxy devices</div>
+        </div>
+
+        <!-- Firefox Android -->
+        <div class="tc" style="cursor:default">
+          <div class="tc-icon"><i class="fab fa-firefox-browser"></i></div>
+          <h3>Firefox (Android)</h3>
+          <ol style="font-size:12px;color:var(--t2);padding-left:18px;line-height:2">
+            <li>Open in <strong style="color:var(--t1)">Firefox for Android</strong></li>
+            <li>Tap <strong style="color:var(--g)">⋮ → Install</strong></li>
+            <li>Or: <strong style="color:var(--g)">Add to Home Screen</strong></li>
+          </ol>
+          <div class="tag" style="margin-top:8px">Firefox 79+</div>
+        </div>
+
+        <!-- Android APK / Play Store -->
+        <div class="tc r" style="cursor:default">
+          <div class="tc-icon r" style="background:rgba(244,63,94,.1);color:var(--r);border-color:rgba(244,63,94,.2)">
+            <i class="fab fa-google-play"></i></div>
+          <h3>Native APK (Android)</h3>
+          <p style="font-size:12px;color:var(--t2);line-height:1.6">
+            A native Android APK is available via the project repository.
+            Build with <code style="color:var(--g);font-family:'DM Mono',monospace">./android-build.sh twa release</code>
+          </p>
+          <div class="tag r" style="border-color:rgba(244,63,94,.3);color:var(--r);background:rgba(244,63,94,.06);margin-top:8px">Play Store coming</div>
+        </div>
+
+      </div>
+
+      <!-- Features when installed -->
+      <div style="background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:24px">
+        <h3 style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px">
+          ✨ What you get when installed</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
+          ${[ ['⚡','Instant load','No browser chrome, app opens in under 1 second'],
+              ['📴','Works offline','All AI tools available with no internet connection'],
+              ['🔔','Notifications','Get alerts for new tracks, events, and followers'],
+              ['🏠','Home screen icon','Quick access from your phone home screen or desktop'],
+              ['🔗','Deep links','Open tracks and events directly in the app'],
+              ['��','4 home screen shortcuts','Virtual DJ, Loops, BPM Detect, Mastering'],
+          ].map(([icon,title,desc]) => `<div style="padding:14px;background:var(--s2);border-radius:10px">
+            <div style="font-size:22px;margin-bottom:6px">${icon}</div>
+            <div style="font-weight:700;font-size:12px;margin-bottom:4px">${title}</div>
+            <div style="font-size:11px;color:var(--t3);line-height:1.5">${desc}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+
   </main>
+</div>
+
+
+<!-- ═══ INSTALL BANNER ═══ -->
+<div id="installBanner" style="display:none;position:fixed;bottom:calc(var(--ph) + 12px);left:50%;
+  transform:translateX(-50%);z-index:800;max-width:500px;width:calc(100% - 32px);
+  background:var(--s1);border:1px solid rgba(0,255,157,.25);border-radius:14px;
+  padding:14px 18px;display:none;align-items:center;gap:14px;
+  box-shadow:0 8px 40px rgba(0,255,157,.12),0 0 0 1px rgba(0,255,157,.06);
+  animation:fadeUp .35s cubic-bezier(.34,1.56,.64,1)">
+  <div style="width:42px;height:42px;border-radius:11px;background:rgba(0,255,157,.1);
+    border:1px solid rgba(0,255,157,.3);display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0">🎵</div>
+  <div style="flex:1;min-width:0">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;margin-bottom:2px">
+      Install BassFlow App</div>
+    <div style="font-size:11px;color:var(--t3)">Works offline · No app store needed · Free</div>
+  </div>
+  <button onclick="triggerInstall()" style="padding:8px 16px;border-radius:8px;
+    background:var(--g);color:#000;border:none;font-family:'Syne',sans-serif;
+    font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap;flex-shrink:0">
+    Install
+  </button>
+  <button onclick="dismissBanner()" style="background:none;border:none;color:var(--t3);
+    cursor:pointer;font-size:16px;flex-shrink:0;padding:4px">✕</button>
 </div>
 
 <!-- ═══ PLAYER BAR ═══ -->
@@ -2531,6 +2757,151 @@ document.querySelectorAll('[onclick*="showS("]').forEach(el => {
   const m = el.getAttribute('onclick').match(/showS\('(\w+)',(.*?)\)/);
   if (m) el.setAttribute('onclick', `showSPatched('${m[1]}',${m[2]})`);
 });
+
+
+/* ════════════════════════════════════
+   PWA INSTALL ENGINE
+════════════════════════════════════ */
+let _installPrompt = null;
+let _installDismissed = false;
+
+// ── Capture beforeinstallprompt (Android / Desktop Chrome / Edge) ─────────────
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _installPrompt = e;
+  showInstallUI();
+});
+
+// ── Already installed ─────────────────────────────────────────────────────────
+window.addEventListener('appinstalled', () => {
+  _installPrompt = null;
+  hideInstallUI();
+  toast('🎉 BassFlow installed! Find it on your Home Screen.', 'info');
+  setInstallStatus('✅ App is installed on this device');
+  localStorage.setItem('bf_installed', '1');
+});
+
+function showInstallUI() {
+  // Navbar button
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'inline-flex';
+  // Banner (show once, respect dismiss)
+  const dismissed = parseInt(localStorage.getItem('bf_banner_dismiss') || '0');
+  if (!dismissed || Date.now() - dismissed > 3 * 24 * 60 * 60 * 1000) {
+    showBanner();
+  }
+  setInstallStatus('✅ Ready to install — tap the Install button above');
+}
+
+function hideInstallUI() {
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.style.display = 'none';
+  hideBanner();
+}
+
+async function triggerInstall() {
+  // iOS — show manual instructions
+  if (isIOS()) { showIosModal(); return; }
+  // Has native prompt
+  if (_installPrompt) {
+    _installPrompt.prompt();
+    const { outcome } = await _installPrompt.userChoice;
+    _installPrompt = null;
+    if (outcome === 'accepted') {
+      toast('🎉 Installing BassFlow…', 'info');
+    } else {
+      toast('Installation cancelled', 'info');
+    }
+    hideBanner();
+    return;
+  }
+  // Fallback — go to install screen
+  showS('sInstall', null);
+}
+
+function showBanner() {
+  const b = document.getElementById('installBanner');
+  if (b) b.style.display = 'flex';
+}
+function hideBanner() {
+  const b = document.getElementById('installBanner');
+  if (b) b.style.display = 'none';
+}
+function dismissBanner() {
+  hideBanner();
+  localStorage.setItem('bf_banner_dismiss', Date.now().toString());
+}
+
+function showIosModal() {
+  const m = document.getElementById('iosModal');
+  if (m) m.style.display = 'flex';
+}
+function closeIosModal() {
+  const m = document.getElementById('iosModal');
+  if (m) m.style.display = 'none';
+}
+// Close iOS modal on backdrop click
+document.getElementById('iosModal') && document.getElementById('iosModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('iosModal')) closeIosModal();
+});
+
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function isAndroid() { return /android/i.test(navigator.userAgent); }
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+}
+
+function setInstallStatus(msg) {
+  const el = document.getElementById('installStatus');
+  if (el) el.textContent = msg;
+}
+
+// ── Detect platform and set status on install screen ─────────────────────────
+(function detectPlatform() {
+  if (isStandalone()) {
+    setInstallStatus('✅ Running as installed app');
+    hideInstallUI();
+    return;
+  }
+  if (localStorage.getItem('bf_installed')) {
+    setInstallStatus('✅ BassFlow is installed on this device');
+    return;
+  }
+  if (isIOS()) {
+    setInstallStatus('📱 iOS detected — tap "iPhone / iPad" for install steps');
+    return;
+  }
+  if (isAndroid()) {
+    setInstallStatus('⏳ Android detected — waiting for install prompt…');
+    return;
+  }
+  setInstallStatus('💻 Desktop — install prompt will appear in the address bar or navbar');
+})();
+
+// ── Handle ?screen= URL param (from manifest shortcuts) ──────────────────────
+(function handleScreenParam() {
+  const params = new URLSearchParams(location.search);
+  const screen = params.get('screen');
+  if (screen) {
+    // Wait for DOM ready, then navigate
+    requestAnimationFrame(() => { if (typeof showS === 'function') showS(screen, null); });
+  }
+})();
+
+// ── Handle Web Share Target ────────────────────────────────────────────────────
+(function handleShareTarget() {
+  const params = new URLSearchParams(location.search);
+  if (params.get('share_url') || params.get('share_text')) {
+    const url   = params.get('share_url')   || '';
+    const text  = params.get('share_text')  || '';
+    const title = params.get('share_title') || '';
+    toast(`📥 Shared: ${title || url || text}`.substring(0, 60), 'info');
+  }
+})();
 
 /* ════════════════════════════════════
    PWA SERVICE WORKER
