@@ -2,7 +2,8 @@
  * BassFlow API — routes/tracks.js
  * GET    /api/tracks              — list (genre, q, limit, offset)
  * GET    /api/tracks/:id          — single track + comments
- * POST   /api/tracks              — create [auth]
+ * POST   /api/tracks              — create (JSON) [auth]
+ * POST   /api/tracks/upload       — upload audio + cover files [auth]
  * PUT    /api/tracks/:id          — update [auth + owner]
  * DELETE /api/tracks/:id          — delete [auth + owner]
  * POST   /api/tracks/:id/like     — toggle like [auth]
@@ -13,10 +14,42 @@
 'use strict';
 
 const express = require('express');
+const multer  = require('multer');
+const path    = require('path');
+const fs      = require('fs');
 const { getDb } = require('../db');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 
 const router = express.Router();
+
+// ── Multer storage (disk, uploads/ dir) ───────────────────────────────────────
+const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+const AUDIO_MIME  = new Set(['audio/mpeg', 'audio/wav', 'audio/flac', 'audio/aac', 'audio/ogg', 'audio/x-m4a']);
+const IMAGE_MIME  = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const MAX_AUDIO   = 150 * 1024 * 1024;  // 150 MB
+const MAX_COVER   = 8   * 1024 * 1024;  // 8 MB
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+  filename:    (_req, file, cb) => {
+    const ext  = path.extname(file.originalname).toLowerCase();
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+    cb(null, name);
+  },
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_AUDIO },
+  fileFilter: (_req, file, cb) => {
+    const allowed = file.fieldname === 'audio' ? AUDIO_MIME : IMAGE_MIME;
+    if (allowed.has(file.mimetype)) return cb(null, true);
+    cb(new Error(`Unsupported file type: ${file.mimetype}`));
+  },
+});
+
 
 // GET /api/tracks
 router.get('/', optionalAuth, (req, res) => {
@@ -67,8 +100,46 @@ router.get('/:id', optionalAuth, (req, res) => {
   return res.json({ track, comments });
 });
 
-// POST /api/tracks
-router.post('/', requireAuth, (req, res) => {
+// POST /api/tracks/upload — multipart audio + cover file upload
+router.post('/upload', requireAuth, (req, res) => {
+  const uploader = upload.fields([
+    { name: 'audio', maxCount: 1 },
+    { name: 'cover', maxCount: 1 },
+  ]);
+
+  uploader(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'Upload failed' });
+    }
+
+    const audioFile = req.files && req.files['audio'] && req.files['audio'][0];
+    const coverFile = req.files && req.files['cover'] && req.files['cover'][0];
+
+    if (!audioFile) return res.status(400).json({ error: 'audio file is required' });
+
+    const { title, artist, genre = 'dnb', bpm = 174, key_note } = req.body;
+    if (!title || !artist) {
+      // Remove uploaded files if validation fails
+      if (audioFile) fs.unlink(audioFile.path, () => {});
+      if (coverFile) fs.unlink(coverFile.path, () => {});
+      return res.status(400).json({ error: 'title and artist are required' });
+    }
+
+    const audio_url   = `/uploads/${audioFile.filename}`;
+    const artwork_url = coverFile ? `/uploads/${coverFile.filename}` : null;
+
+    const db     = getDb();
+    const result = db.prepare(`
+      INSERT INTO tracks (title,artist,genre,bpm,key_note,audio_url,artwork_url,user_id)
+      VALUES (?,?,?,?,?,?,?,?)
+    `).run(title, artist, genre, Number(bpm) || 174, key_note || null, audio_url, artwork_url, req.user.id);
+
+    const track = db.prepare('SELECT * FROM tracks WHERE id=?').get(result.lastInsertRowid);
+    return res.status(201).json({ track });
+  });
+});
+
+
   const { title, artist, genre = 'dnb', bpm = 174, key_note, audio_url, artwork_url, color } = req.body;
   if (!title || !artist) return res.status(400).json({ error: 'title and artist are required' });
 

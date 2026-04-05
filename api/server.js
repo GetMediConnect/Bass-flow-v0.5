@@ -25,6 +25,11 @@ app.use(express.static(ROOT, {
   extensions: ['html'],
 }));
 
+// ── Uploaded media files ───────────────────────────────────────────────────────
+const UPLOADS = path.join(__dirname, 'uploads');
+if (!require('fs').existsSync(UPLOADS)) require('fs').mkdirSync(UPLOADS, { recursive: true });
+app.use('/uploads', express.static(UPLOADS));
+
 // ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/auth',   require('./routes/auth'));
 app.use('/api/tracks', require('./routes/tracks'));

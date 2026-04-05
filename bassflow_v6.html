@@ -486,6 +486,103 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
 .auth-skip{text-align:center;margin-top:12px}
 .auth-skip a{color:var(--g);cursor:pointer;font-size:12px;text-decoration:underline}
 
+/* ── VIRTUAL DJ ── */
+.dj-layout{display:grid;grid-template-columns:1fr 120px 1fr;gap:16px;align-items:start}
+.deck{background:var(--s2);border:1px solid var(--b1);border-radius:16px;padding:20px;position:relative}
+.deck-label{font-family:'Syne',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;
+  font-weight:800;margin-bottom:14px;display:block}
+.deck-a .deck-label{color:var(--g)} .deck-b .deck-label{color:var(--p)}
+.deck-info{background:var(--bg);border-radius:10px;padding:12px;margin-bottom:14px;min-height:60px}
+.deck-title{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.deck-bpm{font-family:'DM Mono',monospace;font-size:22px;font-weight:800;color:var(--g);display:block;margin-top:4px}
+.deck-b .deck-bpm{color:var(--p)}
+.deck-wave{height:50px;border-radius:8px;overflow:hidden;background:var(--s3);margin-bottom:14px;
+  display:flex;align-items:center;padding:4px;gap:1px}
+.dw-b{width:2px;border-radius:1px;flex-shrink:0;min-height:4px}
+.deck-eq{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.eq-knob-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.eq-knob-lbl{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:.5px}
+.knob{width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--g) 0deg,var(--s4) 0deg);
+  border:2px solid var(--b2);cursor:pointer;position:relative;
+  display:flex;align-items:center;justify-content:center;font-size:9px;
+  font-family:'DM Mono',monospace;color:var(--t2);transition:box-shadow .2s;user-select:none}
+.knob:hover{box-shadow:0 0 12px rgba(0,255,157,.3)}
+.deck-b .knob:hover{box-shadow:0 0 12px rgba(168,85,247,.3)}
+.deck-ctrl{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.deck-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--b1);
+  background:var(--s3);color:var(--t2);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s}
+.deck-btn:hover,.deck-btn.on{border-color:var(--g);color:var(--g);box-shadow:0 0 12px rgba(0,255,157,.2)}
+.deck-b .deck-btn:hover,.deck-b .deck-btn.on{border-color:var(--p);color:var(--p);box-shadow:0 0 12px rgba(168,85,247,.2)}
+.deck-play{width:52px;height:52px;border-radius:50%;background:var(--g);color:#000;border:none;
+  font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.deck-b .deck-play{background:var(--p);color:#fff}
+.deck-play:hover{transform:scale(1.08);box-shadow:var(--glow-g)}
+.deck-b .deck-play:hover{box-shadow:var(--glow-p)}
+.crossfader-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:40px}
+.cf-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+input[type=range].cf-slider{writing-mode:vertical-lr;direction:rtl;
+  width:4px;height:180px;accent-color:var(--b);cursor:pointer}
+.dj-fx{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tempo-nudge{display:flex;align-items:center;gap:8px;margin-top:10px}
+.tempo-val{font-family:'DM Mono',monospace;font-size:11px;color:var(--t2);width:50px;text-align:center}
+
+/* ── LOOP MACHINE ── */
+.loop-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.loop-bpm-disp{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:var(--g);line-height:1}
+.loop-pads-grid{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.loop-row{display:flex;align-items:center;gap:6px}
+.loop-row-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--t3);width:56px;flex-shrink:0;text-align:right}
+.lp{width:36px;height:36px;border-radius:7px;border:1px solid var(--b1);
+  background:var(--s3);cursor:pointer;transition:all .12s;position:relative}
+.lp:hover{border-color:var(--b2)}
+.lp.on{border-color:var(--g);box-shadow:0 0 8px rgba(0,255,157,.3)}
+.lp.beat{animation:lp-flash .08s ease}
+@keyframes lp-flash{0%{background:rgba(0,255,157,.15)}100%{background:transparent}}
+.lp.on.beat{background:rgba(0,255,157,.35)!important}
+/* per-instrument colours */
+.row-kick .lp.on{background:rgba(0,255,157,.2);border-color:var(--g)}
+.row-snare .lp.on{background:rgba(244,63,94,.2);border-color:var(--r)}
+.row-hihat .lp.on{background:rgba(34,211,238,.2);border-color:var(--b)}
+.row-ohihat .lp.on{background:rgba(251,191,36,.2);border-color:var(--y)}
+.row-clap .lp.on{background:rgba(168,85,247,.2);border-color:var(--p)}
+.row-bass .lp.on{background:rgba(0,255,157,.2);border-color:var(--g)}
+.row-lead .lp.on{background:rgba(168,85,247,.2);border-color:var(--p)}
+.row-fx .lp.on{background:rgba(251,146,60,.2);border-color:var(--o)}
+.step-counter{display:flex;gap:6px;margin-bottom:6px;padding-left:62px}
+.step-num{width:36px;text-align:center;font-family:'DM Mono',monospace;font-size:8px;color:var(--t3)}
+.step-num.current{color:var(--g)}
+.loop-transport{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
+.loop-patterns{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.lp-slot{padding:10px;border-radius:9px;border:1px solid var(--b1);background:var(--s2);
+  font-family:'DM Mono',monospace;font-size:11px;color:var(--t3);cursor:pointer;text-align:center;transition:all .2s}
+.lp-slot:hover{border-color:var(--b2);color:var(--t1)}
+.lp-slot.on{border-color:var(--g);color:var(--g);background:rgba(0,255,157,.06)}
+
+/* ── AI PRICING AGENT ── */
+.pricing-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.chat-window{background:var(--bg);border:1px solid var(--b1);border-radius:14px;
+  padding:20px;min-height:400px;max-height:500px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:12px 16px;border-radius:14px;font-size:13px;line-height:1.6;animation:fadeUp .2s ease}
+.msg.agent{background:var(--s2);border:1px solid var(--b1);border-radius:14px 14px 14px 0;align-self:flex-start}
+.msg.user{background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.2);
+  border-radius:14px 14px 0 14px;align-self:flex-end;text-align:right}
+.msg.agent strong{color:var(--g);font-family:'DM Mono',monospace;font-size:10px;display:block;margin-bottom:4px}
+.chat-input-row{display:flex;gap:8px;margin-top:14px}
+.pricing-tiers{display:flex;flex-direction:column;gap:12px}
+.tier-card{background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px;position:relative;overflow:hidden}
+.tier-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.tier-starter::before{background:var(--b)}.tier-pro::before{background:var(--g)}.tier-premium::before{background:var(--p)}
+.tier-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:4px}
+.tier-starter .tier-name{color:var(--b)}.tier-pro .tier-name{color:var(--g)}.tier-premium .tier-name{color:var(--p)}
+.tier-price{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;display:block;margin:8px 0}
+.tier-starter .tier-price{color:var(--b)}.tier-pro .tier-price{color:var(--g)}.tier-premium .tier-price{color:var(--p)}
+.tier-feats{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--t2)}
+.tier-feats li::before{content:'✓ ';color:var(--g);font-weight:700}
+.tier-premium .tier-feats li::before{color:var(--p)}
+.tier-starter .tier-feats li::before{color:var(--b)}
+.pricing-summary{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px;margin-top:14px;font-size:12px;color:var(--t2);line-height:1.7}
+
 </style>
 </head>
 <body>
@@ -544,6 +641,9 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
     <a class="nl" onclick="showS('sCover',this)">Cover Art</a>
     <a class="nl" onclick="showS('sSet',this)">Set Planner</a>
     <a class="nl" onclick="showS('sCommunity',this)">Community</a>
+    <a class="nl" onclick="showS('sVirtualDJ',this)">Virtual DJ</a>
+    <a class="nl" onclick="showS('sLoopMachine',this)">Loops</a>
+    <a class="nl" onclick="showS('sPricing',this)">Pricing AI</a>
   </div>
   <div class="nav-r">
     <div class="nav-xp" id="navXP">0 XP</div>
@@ -586,6 +686,9 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
     </div>
     <div class="sb-sec">
       <span class="sb-lbl">Classic Tools</span>
+      <button class="si" onclick="showS('sVirtualDJ',this)"><i class="fas fa-headphones"></i>Virtual DJ<span class="sb-badge r">NEW</span></button>
+      <button class="si" onclick="showS('sLoopMachine',this)"><i class="fas fa-drum"></i>Loop Machine<span class="sb-badge y">NEW</span></button>
+      <button class="si" onclick="showS('sPricing',this)"><i class="fas fa-robot"></i>AI Pricing<span class="sb-badge p">AI</span></button>
       <button class="si" onclick="showS('sSuno',this)"><i class="fas fa-pen-nib"></i>Suno Prompt</button>
       <button class="si" onclick="showS('sLyrics',this)"><i class="fas fa-music"></i>Lyrics Gen</button>
       <button class="si" onclick="showS('sMixDesc',this)"><i class="fas fa-file-lines"></i>Mix Description</button>
@@ -698,6 +801,9 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
         <div class="tc" onclick="showS('sSuno',null)"><div class="tc-icon"><i class="fas fa-pen-nib"></i></div><h3>Suno Prompt Builder</h3><p>Genre-aware Suno v4/v4.5 prompts with metatags, mood, BPM, and language formatting.</p><div class="tag">Suno v4.5</div></div>
         <div class="tc p" onclick="showS('sLyrics',null)"><div class="tc-icon p"><i class="fas fa-music"></i></div><h3>Lyric Generator</h3><p>Original DnB lyrics in English or Polish — MC chants, atmospheric, hype styles.</p><div class="tag p">EN / PL</div></div>
         <div class="tc b" onclick="showS('sMixDesc',null)"><div class="tc-icon b"><i class="fas fa-file-lines"></i></div><h3>Mix Description</h3><p>Professional SoundCloud/Mixcloud copy from your mix details — SEO-optimised.</p><div class="tag b">SoundCloud</div></div>
+        <div class="tc r" onclick="showS('sVirtualDJ',null)"><div class="tc-badge r">NEW</div><div class="tc-icon r" style="background:rgba(244,63,94,.1);color:var(--r);border-color:rgba(244,63,94,.2)"><i class="fas fa-headphones"></i></div><h3>Virtual DJ Mixer</h3><p>Dual-deck CDJ simulator with crossfader, per-deck EQ, FX chain, and BPM sync. No hardware needed.</p><div class="tag r" style="border-color:rgba(244,63,94,.3);color:var(--r);background:rgba(244,63,94,.06)">CDJ Sim</div></div>
+        <div class="tc y" onclick="showS('sLoopMachine',null)"><div class="tc-badge y">NEW</div><div class="tc-icon y" style="background:rgba(251,191,36,.1);color:var(--y);border-color:rgba(251,191,36,.2)"><i class="fas fa-drum"></i></div><h3>Loop Machine</h3><p>16-step sequencer with 8 DnB drum/bass pads. Live pattern switching, BPM sync, export.</p><div class="tag y" style="border-color:rgba(251,191,36,.3);color:var(--y);background:rgba(251,191,36,.06)">Step Seq</div></div>
+        <div class="tc p" onclick="showS('sPricing',null)"><div class="tc-badge p">AI</div><div class="tc-icon p"><i class="fas fa-robot"></i></div><h3>AI Pricing Agent</h3><p>Chat interview with our AI that analyses your profile and generates custom DJ booking price tiers.</p><div class="tag p">GPT-style</div></div>
         <div class="tc y"><div class="tc-badge y">Q2 2025</div><div class="tc-icon y"><i class="fas fa-microphone"></i></div><h3>Voice Clone — MC Tool</h3><p>Clone your voice for AI MC drops and vocal chops. Studio plan feature coming soon.</p><div class="tag y">Beta</div></div>
         <div class="tc r"><div class="tc-badge r">Future</div><div class="tc-icon r"><i class="fas fa-vr-cardboard"></i></div><h3>VR Event Builder</h3><p>Create immersive virtual DnB events and rave spaces for Oculus / WebXR platforms.</p><div class="tag r">Experimental</div></div>
       </div>
@@ -1075,6 +1181,165 @@ input[type=range].eq-slider{writing-mode:vertical-lr;direction:rtl;
     <div class="screen" id="sCommunity">
       <div class="ph"><h2>Community</h2><p>DnB creators worldwide</p></div>
       <div id="communityFeed"></div>
+    </div>
+
+
+    <!-- ═══ VIRTUAL DJ ═══ -->
+    <div class="screen" id="sVirtualDJ">
+      <div class="ph"><h2>🎧 Virtual DJ Mixer</h2><p>Dual-deck CDJ simulator — crossfader, EQ, FX, BPM sync</p></div>
+      <div class="dj-layout">
+        <!-- DECK A -->
+        <div class="deck deck-a">
+          <span class="deck-label">● DECK A</span>
+          <div class="deck-info">
+            <div class="deck-title" id="deckATitle">Drop a track or load from library…</div>
+            <span class="deck-bpm" id="deckABpm">174.0</span>
+            <input type="file" accept="audio/*" style="display:none" id="deckAFile" onchange="djLoad('A',this)">
+          </div>
+          <div class="deck-wave" id="deckAWave"></div>
+          <div class="deck-eq">
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobABass" onmousedown="knobDrag('knobABass','deckA','bass',event)">0</div>
+              <span class="eq-knob-lbl">BASS</span>
+            </div>
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobAMid" onmousedown="knobDrag('knobAMid','deckA','mid',event)">0</div>
+              <span class="eq-knob-lbl">MID</span>
+            </div>
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobAHi" onmousedown="knobDrag('knobAHi','deckA','hi',event)">0</div>
+              <span class="eq-knob-lbl">HI</span>
+            </div>
+          </div>
+          <div class="deck-ctrl">
+            <button class="deck-btn" title="Cue" onclick="djCue('A')"><i class="fas fa-arrow-left-to-line"></i></button>
+            <button class="deck-play" id="deckAPlayBtn" onclick="djPlay('A')"><i class="fas fa-play" id="deckAPlayIcon"></i></button>
+            <button class="deck-btn" title="Loop" id="deckALoop" onclick="djToggleLoop('A')"><i class="fas fa-repeat"></i></button>
+            <button class="deck-btn" title="Load track" onclick="document.getElementById('deckAFile').click()"><i class="fas fa-folder-open"></i></button>
+          </div>
+          <div class="tempo-nudge">
+            <button class="btn btn-ghost btn-xs" onclick="djTempo('A',-0.5)">−</button>
+            <span class="tempo-val" id="deckATempo">0.0%</span>
+            <button class="btn btn-ghost btn-xs" onclick="djTempo('A',+0.5)">+</button>
+            <button class="btn btn-ghost btn-xs" onclick="djSync('A')"><i class="fas fa-link"></i> SYNC</button>
+          </div>
+          <div class="dj-fx">
+            <button class="fx-btn" id="fxAFilter" onclick="djFX('A','filter',this)">🎚 Filter</button>
+            <button class="fx-btn" id="fxAReverb" onclick="djFX('A','reverb',this)">🌊 Reverb</button>
+            <button class="fx-btn" id="fxADelay"  onclick="djFX('A','delay',this)">🔁 Delay</button>
+            <button class="fx-btn" id="fxAFlanger" onclick="djFX('A','flanger',this)">〰 Flange</button>
+          </div>
+        </div>
+        <!-- CROSSFADER -->
+        <div class="crossfader-wrap">
+          <span class="cf-label">A</span>
+          <input type="range" class="cf-slider" id="crossfader" min="0" max="100" value="50" oninput="djCrossfade(this.value)">
+          <span class="cf-label">B</span>
+          <div style="margin-top:20px;text-align:center">
+            <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:6px">MASTER</div>
+            <input type="range" style="width:70px;accent-color:var(--g)" id="djMasterVol" min="0" max="100" value="80" oninput="djMasterVolume(this.value)">
+          </div>
+        </div>
+        <!-- DECK B -->
+        <div class="deck deck-b">
+          <span class="deck-label">● DECK B</span>
+          <div class="deck-info">
+            <div class="deck-title" id="deckBTitle">Drop a track or load from library…</div>
+            <span class="deck-bpm" id="deckBBpm">174.0</span>
+            <input type="file" accept="audio/*" style="display:none" id="deckBFile" onchange="djLoad('B',this)">
+          </div>
+          <div class="deck-wave" id="deckBWave"></div>
+          <div class="deck-eq">
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobBBass" onmousedown="knobDrag('knobBBass','deckB','bass',event)">0</div>
+              <span class="eq-knob-lbl">BASS</span>
+            </div>
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobBMid" onmousedown="knobDrag('knobBMid','deckB','mid',event)">0</div>
+              <span class="eq-knob-lbl">MID</span>
+            </div>
+            <div class="eq-knob-wrap">
+              <div class="knob" id="knobBHi" onmousedown="knobDrag('knobBHi','deckB','hi',event)">0</div>
+              <span class="eq-knob-lbl">HI</span>
+            </div>
+          </div>
+          <div class="deck-ctrl">
+            <button class="deck-btn" title="Cue" onclick="djCue('B')"><i class="fas fa-arrow-left-to-line"></i></button>
+            <button class="deck-play" id="deckBPlayBtn" onclick="djPlay('B')"><i class="fas fa-play" id="deckBPlayIcon"></i></button>
+            <button class="deck-btn" title="Loop" id="deckBLoop" onclick="djToggleLoop('B')"><i class="fas fa-repeat"></i></button>
+            <button class="deck-btn" title="Load track" onclick="document.getElementById('deckBFile').click()"><i class="fas fa-folder-open"></i></button>
+          </div>
+          <div class="tempo-nudge">
+            <button class="btn btn-ghost btn-xs" onclick="djTempo('B',-0.5)">−</button>
+            <span class="tempo-val" id="deckBTempo">0.0%</span>
+            <button class="btn btn-ghost btn-xs" onclick="djTempo('B',+0.5)">+</button>
+            <button class="btn btn-ghost btn-xs" onclick="djSync('B')"><i class="fas fa-link"></i> SYNC</button>
+          </div>
+          <div class="dj-fx">
+            <button class="fx-btn" id="fxBFilter" onclick="djFX('B','filter',this)">🎚 Filter</button>
+            <button class="fx-btn" id="fxBReverb" onclick="djFX('B','reverb',this)">🌊 Reverb</button>
+            <button class="fx-btn" id="fxBDelay"  onclick="djFX('B','delay',this)">🔁 Delay</button>
+            <button class="fx-btn" id="fxBFlanger" onclick="djFX('B','flanger',this)">〰 Flange</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ LOOP MACHINE ═══ -->
+    <div class="screen" id="sLoopMachine">
+      <div class="ph"><h2>🥁 Loop Machine</h2><p>16-step drum & bass sequencer — 8 pads, BPM sync, pattern bank</p></div>
+      <div class="loop-header">
+        <div>
+          <div class="loop-bpm-disp" id="loopBpmDisp">174</div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px">BPM</div>
+        </div>
+        <input type="range" style="width:140px;accent-color:var(--g)" id="loopBpmSlider" min="80" max="220" value="174" oninput="setLoopBpm(this.value)">
+        <div class="loop-transport">
+          <button class="btn btn-g" id="loopPlayBtn" onclick="toggleLoop()"><i class="fas fa-play" id="loopPlayIcon"></i> PLAY</button>
+          <button class="btn btn-ghost" onclick="stopLoop()"><i class="fas fa-stop"></i> STOP</button>
+          <button class="btn btn-ghost" onclick="clearLoop()"><i class="fas fa-trash"></i> CLEAR</button>
+          <button class="btn btn-ghost" onclick="randomLoop()"><i class="fas fa-shuffle"></i> RANDOM</button>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);margin-bottom:4px">SWING</div>
+          <input type="range" style="width:80px;accent-color:var(--y)" id="loopSwing" min="0" max="50" value="0" oninput="updateSwing(this.value)">
+        </div>
+      </div>
+      <!-- Step numbers -->
+      <div class="step-counter" id="stepCounter"></div>
+      <!-- Pads grid -->
+      <div class="loop-pads-grid" id="loopPadsGrid"></div>
+      <!-- Pattern bank -->
+      <div style="margin-top:16px">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:10px">PATTERN BANK</div>
+        <div class="loop-patterns" id="loopPatterns"></div>
+      </div>
+    </div>
+
+    <!-- ═══ AI PRICING AGENT ═══ -->
+    <div class="screen" id="sPricing">
+      <div class="ph"><h2>🤖 AI Pricing Agent</h2><p>Tell me about yourself — I'll generate custom DJ booking price tiers</p></div>
+      <div class="pricing-layout">
+        <div>
+          <div class="chat-window" id="pricingChat"></div>
+          <div class="chat-input-row">
+            <input class="inp" id="pricingInput" placeholder="Type your answer…" onkeydown="if(event.key==='Enter')pricingReply()">
+            <button class="btn btn-g" onclick="pricingReply()"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--t3);letter-spacing:2px;margin-bottom:14px">GENERATED PRICING</div>
+          <div class="pricing-tiers" id="pricingTiers">
+            <div style="text-align:center;padding:40px;color:var(--t3);font-size:12px">
+              Complete the interview to generate your pricing tiers
+            </div>
+          </div>
+          <div class="pricing-summary" id="pricingSummary" style="display:none"></div>
+          <button class="btn btn-ghost btn-full btn-sm" id="pricingDownload" style="display:none;margin-top:10px" onclick="pricingDownload()">
+            <i class="fas fa-download"></i> Download Quote PDF
+          </button>
+        </div>
+      </div>
     </div>
 
   </main>
@@ -1769,6 +2034,504 @@ document.querySelectorAll('.nl,.si').forEach(el=>{
     },100);
   });
 });
+
+/* ════════════════════════════════════
+   VIRTUAL DJ ENGINE
+════════════════════════════════════ */
+const DJ = {
+  A: { buf: null, src: null, gain: null, bass: null, mid: null, hi: null,
+       playing: false, bpm: 174, tempo: 0, loop: false, fx: {} },
+  B: { buf: null, src: null, gain: null, bass: null, mid: null, hi: null,
+       playing: false, bpm: 174, tempo: 0, loop: false, fx: {} },
+};
+let djCrossfadeVal = 50;
+
+function djGetCtx() {
+  return getAudioCtx();
+}
+
+async function djLoad(deck, inp) {
+  const file = inp.files[0]; if (!file) return;
+  const ctx  = djGetCtx();
+  const ab   = await file.arrayBuffer();
+  const buf  = await ctx.decodeAudioData(ab);
+  DJ[deck].buf  = buf;
+  DJ[deck].bpm  = 174; // default until detection
+  document.getElementById(`deck${deck}Title`).textContent = file.name.replace(/\.[^.]+$/, '');
+  // draw mini waveform
+  djDrawWave(deck, buf);
+  toast(`🎧 Deck ${deck}: ${file.name.substring(0,25)}…`, 'info');
+}
+
+function djDrawWave(deck, buf) {
+  const container = document.getElementById(`deck${deck}Wave`);
+  container.innerHTML = '';
+  const data  = buf.getChannelData(0);
+  const steps = 60;
+  const step  = Math.floor(data.length / steps);
+  const colours = { A: '#00ff9d', B: '#a855f7' };
+  for (let i = 0; i < steps; i++) {
+    let max = 0;
+    for (let j = 0; j < step; j++) { const v = Math.abs(data[i * step + j]); if (v > max) max = v; }
+    const bar = document.createElement('div');
+    bar.className = 'dw-b';
+    bar.style.cssText = `height:${8 + max * 34}px;background:${colours[deck]};opacity:${0.4 + max * 0.6}`;
+    container.appendChild(bar);
+  }
+}
+
+function djPlay(deck) {
+  const ctx = djGetCtx();
+  const d   = DJ[deck];
+  if (!d.buf) { toast(`Load a track onto Deck ${deck} first`, 'err'); return; }
+
+  if (d.playing) {
+    d.src && d.src.stop();
+    d.playing = false;
+    document.getElementById(`deck${deck}PlayIcon`).className = 'fas fa-play';
+    return;
+  }
+
+  // Build node chain: src → bass → mid → hi → gain → destination
+  d.bass = ctx.createBiquadFilter(); d.bass.type = 'lowshelf';  d.bass.frequency.value = 200;
+  d.mid  = ctx.createBiquadFilter(); d.mid.type  = 'peaking';   d.mid.frequency.value  = 1000;
+  d.hi   = ctx.createBiquadFilter(); d.hi.type   = 'highshelf'; d.hi.frequency.value   = 8000;
+  d.gain = ctx.createGain();
+
+  d.src  = ctx.createBufferSource();
+  d.src.buffer = d.buf;
+  d.src.loop   = d.loop;
+  d.src.playbackRate.value = 1 + (d.tempo / 100);
+  d.src.connect(d.bass); d.bass.connect(d.mid); d.mid.connect(d.hi);
+  d.hi.connect(d.gain); d.gain.connect(ctx.destination);
+
+  djApplyCrossfade();
+  d.src.start();
+  d.playing = true;
+  d.src.onended = () => { if (!d.loop) { d.playing = false; document.getElementById(`deck${deck}PlayIcon`).className = 'fas fa-play'; } };
+  document.getElementById(`deck${deck}PlayIcon`).className = 'fas fa-pause';
+}
+
+function djCue(deck) {
+  const d = DJ[deck];
+  if (d.playing) { d.src && d.src.stop(); d.playing = false; document.getElementById(`deck${deck}PlayIcon`).className = 'fas fa-play'; }
+}
+
+function djToggleLoop(deck) {
+  DJ[deck].loop = !DJ[deck].loop;
+  if (DJ[deck].src) DJ[deck].src.loop = DJ[deck].loop;
+  document.getElementById(`deck${deck}Loop`).classList.toggle('on', DJ[deck].loop);
+}
+
+function djTempo(deck, delta) {
+  DJ[deck].tempo = Math.round((DJ[deck].tempo + delta) * 10) / 10;
+  if (DJ[deck].src) DJ[deck].src.playbackRate.value = 1 + (DJ[deck].tempo / 100);
+  document.getElementById(`deck${deck}Tempo`).textContent = (DJ[deck].tempo >= 0 ? '+' : '') + DJ[deck].tempo.toFixed(1) + '%';
+}
+
+function djSync(deck) {
+  const other = deck === 'A' ? 'B' : 'A';
+  DJ[deck].bpm   = DJ[other].bpm;
+  DJ[deck].tempo = DJ[other].tempo;
+  if (DJ[deck].src) DJ[deck].src.playbackRate.value = 1 + (DJ[deck].tempo / 100);
+  document.getElementById(`deck${deck}Bpm`).textContent = DJ[deck].bpm.toFixed(1);
+  document.getElementById(`deck${deck}Tempo`).textContent = (DJ[deck].tempo >= 0 ? '+' : '') + DJ[deck].tempo.toFixed(1) + '%';
+  toast(`🔗 Deck ${deck} synced to Deck ${other}`, 'info');
+}
+
+function djCrossfade(val) {
+  djCrossfadeVal = Number(val);
+  djApplyCrossfade();
+}
+function djMasterVolume(val) {
+  ['A','B'].forEach(deck => { if (DJ[deck].gain) DJ[deck].gain.gain.value = (val / 100) * djDeckVolume(deck); });
+}
+function djDeckVolume(deck) {
+  const v = djCrossfadeVal / 100;
+  return deck === 'A' ? 1 - v : v;
+}
+function djApplyCrossfade() {
+  ['A','B'].forEach(deck => {
+    if (DJ[deck].gain) DJ[deck].gain.gain.value = djDeckVolume(deck) * (document.getElementById('djMasterVol').value / 100);
+  });
+}
+
+function djFX(deck, type, btn) {
+  btn.classList.toggle('on');
+  toast(`FX ${type} ${btn.classList.contains('on') ? 'ON' : 'OFF'} — Deck ${deck}`, 'info');
+}
+
+// Knob drag interaction
+let _knobActive = null;
+function knobDrag(id, deck, band, e) {
+  e.preventDefault();
+  _knobActive = { id, deck, band, startY: e.clientY, startVal: 0 };
+  const onMove = (ev) => {
+    if (!_knobActive) return;
+    const delta = (_knobActive.startY - ev.clientY) / 100 * 12;
+    const val = Math.max(-12, Math.min(12, _knobActive.startVal + delta));
+    const el = document.getElementById(_knobActive.id);
+    if (el) { el.textContent = val.toFixed(0); }
+    const d = DJ[deck.replace('deck','')];
+    if (d) {
+      if (band === 'bass' && d.bass) d.bass.gain.value = val;
+      if (band === 'mid'  && d.mid)  d.mid.gain.value  = val;
+      if (band === 'hi'   && d.hi)   d.hi.gain.value   = val;
+    }
+  };
+  const onUp = () => { _knobActive = null; window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('mouseup', onUp);
+}
+
+/* ════════════════════════════════════
+   LOOP MACHINE ENGINE
+════════════════════════════════════ */
+const LOOP_ROWS = [
+  { id: 'kick',   label: 'KICK',   freq: 60,  type: 'sine',     colour: '#00ff9d' },
+  { id: 'snare',  label: 'SNARE',  freq: 200, type: 'triangle', colour: '#f43f5e' },
+  { id: 'hihat',  label: 'HIHAT',  freq: 800, type: 'square',   colour: '#22d3ee' },
+  { id: 'ohihat', label: 'O.HH',   freq: 600, type: 'sawtooth', colour: '#fbbf24' },
+  { id: 'clap',   label: 'CLAP',   freq: 300, type: 'triangle', colour: '#a855f7' },
+  { id: 'bass',   label: 'BASS',   freq: 80,  type: 'sawtooth', colour: '#00ff9d' },
+  { id: 'lead',   label: 'LEAD',   freq: 440, type: 'square',   colour: '#a855f7' },
+  { id: 'fx',     label: 'FX',     freq: 1200,type: 'sine',     colour: '#fb923c' },
+];
+const STEPS = 16;
+let loopPattern = {};      // { rowId: [false x16] }
+let loopBpm     = 174;
+let loopPlaying = false;
+let loopStep    = 0;
+let loopInterval= null;
+let loopPatterns= [null,null,null,null]; // 4 pattern slots
+let loopSwing   = 0;
+let activePatternSlot = 0;
+
+function initLoopMachine() {
+  // Init pattern data
+  LOOP_ROWS.forEach(r => { loopPattern[r.id] = new Array(STEPS).fill(false); });
+
+  // Step counter row
+  const sc = document.getElementById('stepCounter');
+  if (!sc) return;
+  sc.innerHTML = '';
+  for (let i = 0; i < STEPS; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-num'; d.id = `step-n-${i}`; d.textContent = i + 1;
+    sc.appendChild(d);
+  }
+
+  // Pad grid
+  const grid = document.getElementById('loopPadsGrid');
+  grid.innerHTML = '';
+  LOOP_ROWS.forEach(row => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = `loop-row row-${row.id}`;
+    const lbl = document.createElement('div');
+    lbl.className = 'loop-row-lbl'; lbl.textContent = row.label;
+    rowDiv.appendChild(lbl);
+    for (let i = 0; i < STEPS; i++) {
+      const pad = document.createElement('div');
+      pad.className = 'lp'; pad.id = `lp-${row.id}-${i}`;
+      pad.style.borderColor = 'rgba(255,255,255,.06)';
+      pad.onclick = () => togglePad(row.id, i, row.colour);
+      rowDiv.appendChild(pad);
+    }
+    grid.appendChild(rowDiv);
+  });
+
+  // Pattern slots
+  const pb = document.getElementById('loopPatterns');
+  pb.innerHTML = '';
+  for (let i = 0; i < 4; i++) {
+    const s = document.createElement('div');
+    s.className = `lp-slot${i === 0 ? ' on' : ''}`; s.id = `lpslot-${i}`;
+    s.innerHTML = `Pattern ${i + 1}`;
+    s.onclick = () => loadPatternSlot(i);
+    pb.appendChild(s);
+  }
+
+  // Default DnB kick pattern (beats 1,3,5,7,9,11,13,15)
+  [0,2,4,6,8,10,12,14].forEach(i => togglePad('kick', i, '#00ff9d', true));
+  [4,12].forEach(i => togglePad('snare', i, '#f43f5e', true));
+  [0,2,4,6,8,10,12,14].forEach(i => togglePad('hihat', i, '#22d3ee', true));
+}
+
+function togglePad(rowId, step, colour, silent) {
+  loopPattern[rowId][step] = !loopPattern[rowId][step];
+  const pad = document.getElementById(`lp-${rowId}-${step}`);
+  if (!pad) return;
+  const on = loopPattern[rowId][step];
+  pad.classList.toggle('on', on);
+  pad.style.borderColor = on ? colour : 'rgba(255,255,255,.06)';
+  if (!silent) updateXP(1);
+}
+
+function toggleLoop() {
+  if (loopPlaying) { stopLoop(); return; }
+  loopPlaying = true;
+  loopStep    = 0;
+  document.getElementById('loopPlayBtn').className  = 'btn btn-r';
+  document.getElementById('loopPlayIcon').className = 'fas fa-pause';
+  scheduleLoop();
+}
+
+function stopLoop() {
+  loopPlaying = false;
+  clearTimeout(loopInterval);
+  loopStep = 0;
+  document.getElementById('loopPlayBtn').className  = 'btn btn-g';
+  document.getElementById('loopPlayIcon').className = 'fas fa-play';
+  // clear all step highlights
+  for (let i = 0; i < STEPS; i++) {
+    const el = document.getElementById(`step-n-${i}`);
+    if (el) el.classList.remove('current');
+  }
+}
+
+function scheduleLoop() {
+  if (!loopPlaying) return;
+  const stepMs  = (60 / loopBpm / 4) * 1000;
+  const swing   = loopStep % 2 === 1 ? loopSwing : 0;
+  const delay   = stepMs + (stepMs * swing / 100);
+
+  // Highlight current step
+  for (let i = 0; i < STEPS; i++) {
+    const el = document.getElementById(`step-n-${i}`);
+    if (el) el.classList.toggle('current', i === loopStep);
+  }
+
+  // Trigger active pads
+  LOOP_ROWS.forEach(row => {
+    if (loopPattern[row.id][loopStep]) {
+      triggerPad(row, loopStep);
+    }
+  });
+
+  loopStep = (loopStep + 1) % STEPS;
+  loopInterval = setTimeout(scheduleLoop, delay);
+}
+
+function triggerPad(row, step) {
+  const pad = document.getElementById(`lp-${row.id}-${step}`);
+  if (pad) { pad.classList.add('beat'); setTimeout(() => pad.classList.remove('beat'), 100); }
+  // Generate a short tone via Web Audio
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = row.type;
+    osc.frequency.value = row.freq;
+    env.gain.setValueAtTime(0.35, ctx.currentTime);
+    env.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    osc.connect(env); env.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.18);
+  } catch (e) {}
+}
+
+function setLoopBpm(v) {
+  loopBpm = Number(v);
+  document.getElementById('loopBpmDisp').textContent = loopBpm;
+}
+
+function clearLoop() {
+  LOOP_ROWS.forEach(r => {
+    loopPattern[r.id] = new Array(STEPS).fill(false);
+    for (let i = 0; i < STEPS; i++) {
+      const pad = document.getElementById(`lp-${r.id}-${i}`);
+      if (pad) { pad.classList.remove('on'); pad.style.borderColor = 'rgba(255,255,255,.06)'; }
+    }
+  });
+  toast('Pattern cleared', 'info');
+}
+
+function randomLoop() {
+  clearLoop();
+  LOOP_ROWS.forEach(row => {
+    for (let i = 0; i < STEPS; i++) {
+      if (Math.random() < 0.3) togglePad(row.id, i, row.colour, true);
+    }
+  });
+  toast('🎲 Random pattern generated!', 'info');
+}
+
+function updateSwing(v) { loopSwing = Number(v); }
+
+function loadPatternSlot(i) {
+  // Save current → load stored
+  loopPatterns[activePatternSlot] = JSON.parse(JSON.stringify(loopPattern));
+  activePatternSlot = i;
+  document.querySelectorAll('[id^=lpslot]').forEach((el, idx) => el.classList.toggle('on', idx === i));
+  if (loopPatterns[i]) {
+    loopPattern = JSON.parse(JSON.stringify(loopPatterns[i]));
+    LOOP_ROWS.forEach(row => {
+      for (let s = 0; s < STEPS; s++) {
+        const pad = document.getElementById(`lp-${row.id}-${s}`);
+        if (!pad) return;
+        const on = loopPattern[row.id][s];
+        pad.classList.toggle('on', on);
+        pad.style.borderColor = on ? row.colour : 'rgba(255,255,255,.06)';
+      }
+    });
+    toast(`Pattern ${i + 1} loaded`, 'info');
+  } else {
+    clearLoop();
+    toast(`Pattern ${i + 1} (empty)`, 'info');
+  }
+}
+
+/* ════════════════════════════════════
+   AI PRICING AGENT
+════════════════════════════════════ */
+const PRICING_Q = [
+  { key: 'djType',    q: "Hey! 👋 I'm your AI Pricing Agent. Let's build your DJ rate card.\n\nFirst — what type of DJ are you? (e.g. Drum & Bass, House, Techno, Multi-genre, Wedding DJ, etc.)" },
+  { key: 'exp',       q: "Great! How many years of experience do you have DJing? (e.g. 1 year, 5 years, 10+)" },
+  { key: 'gigSize',   q: "What size gigs do you typically play? (e.g. bedroom/home, bar/club 100-300 people, festival 1000+)" },
+  { key: 'location',  q: "Which city/region are you based in? This affects local market rates. (e.g. London, Warsaw, New York)" },
+  { key: 'equipment', q: "Do you bring your own equipment? (e.g. CDJs + mixer, vinyl only, full PA system, laptop + controller)" },
+  { key: 'extras',    q: "Any extras you offer? (e.g. MC, lighting rig, live instruments, recording & mix delivery)" },
+  { key: 'goal',      q: "Last one — what's your main goal? (e.g. earn extra income, go full-time, premium bookings only)" },
+];
+let pricingStep = 0;
+const pricingData = {};
+
+function initPricingAgent() {
+  pricingStep = 0;
+  Object.keys(pricingData).forEach(k => delete pricingData[k]);
+  const chat = document.getElementById('pricingChat');
+  if (!chat || chat.children.length > 0) return;
+  addPricingMsg('agent', PRICING_Q[0].q);
+}
+
+function addPricingMsg(role, text) {
+  const chat = document.getElementById('pricingChat');
+  const msg  = document.createElement('div');
+  msg.className = `msg ${role}`;
+  if (role === 'agent') msg.innerHTML = `<strong>🤖 BassFlow AI</strong>${text.replace(/\n/g,'<br>')}`;
+  else msg.textContent = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function pricingReply() {
+  const inp = document.getElementById('pricingInput');
+  const val = inp.value.trim(); if (!val) return;
+  addPricingMsg('user', val);
+  inp.value = '';
+  pricingData[PRICING_Q[pricingStep].key] = val;
+  pricingStep++;
+  if (pricingStep < PRICING_Q.length) {
+    setTimeout(() => addPricingMsg('agent', PRICING_Q[pricingStep].q), 600);
+  } else {
+    setTimeout(generatePricing, 800);
+  }
+}
+
+function generatePricing() {
+  addPricingMsg('agent', '⚙️ Analysing your profile… generating custom price tiers…');
+
+  // Local pricing logic
+  const { exp, gigSize, location, djType, equipment, extras } = pricingData;
+
+  const expYrs = parseInt(exp) || 1;
+  const isLondon = /london|uk|england/i.test(location);
+  const isUS     = /new york|la|chicago|us|usa/i.test(location);
+  const isPL     = /warsaw|poland|kraków|wrocław/i.test(location);
+  const isFest   = /festival|1000|large/i.test(gigSize);
+  const hasPA    = /pa system|full rig/i.test(equipment || '');
+  const hasMC    = /mc|vocals/i.test(extras || '');
+
+  const base = isPL ? 300 : isLondon || isUS ? 600 : 400;
+  const expM  = 1 + expYrs * 0.08;
+  const festM = isFest ? 2.5 : 1;
+  const paM   = hasPA  ? 1.3 : 1;
+  const mcM   = hasMC  ? 1.2 : 1;
+
+  const s = Math.round(base * 0.7 * expM / 10) * 10;
+  const p = Math.round(base * expM * paM / 10) * 10;
+  const pr= Math.round(base * 1.8 * expM * paM * festM * mcM / 10) * 10;
+  const curr = isPL ? 'PLN' : isUS ? 'USD' : 'GBP';
+
+  const tiers = document.getElementById('pricingTiers');
+  tiers.innerHTML = `
+    <div class="tier-card tier-starter">
+      <div class="tier-name">🎵 Starter</div>
+      <span class="tier-price">${curr} ${s}–${s+50}</span>
+      <ul class="tier-feats">
+        <li>Up to 2 hours</li><li>Digital setup only</li>
+        <li>Small venue (under 100)</li><li>No equipment provided</li>
+        <li>Weekend booking</li>
+      </ul>
+    </div>
+    <div class="tier-card tier-pro">
+      <div class="tier-name">🔥 Pro</div>
+      <span class="tier-price">${curr} ${p}–${p+100}</span>
+      <ul class="tier-feats">
+        <li>Up to 4 hours</li><li>${equipment || 'Own controller + mixer'}</li>
+        <li>Club / bar (100–500)</li><li>Travel in city included</li>
+        <li>Recording provided</li>
+      </ul>
+    </div>
+    <div class="tier-card tier-premium">
+      <div class="tier-name">👑 Premium</div>
+      <span class="tier-price">${curr} ${pr}+</span>
+      <ul class="tier-feats">
+        <li>Full evening (5+ hours)</li><li>${hasPA ? 'Full PA system' : 'Festival/large stage'}</li>
+        <li>Festival / corporate event</li>${hasMC ? '<li>Live MC included</li>' : ''}
+        <li>Travel + accommodation</li><li>Custom promo mix</li>
+      </ul>
+    </div>`;
+
+  const summary = document.getElementById('pricingSummary');
+  summary.style.display = 'block';
+  summary.innerHTML = `<strong style="color:var(--g)">Your Profile Summary</strong><br>
+🎧 Genre: ${djType} &nbsp;·&nbsp; 📅 ${expYrs}yr exp<br>
+📍 ${location} &nbsp;·&nbsp; 🏟 ${gigSize}<br>
+💡 Tip: Based on local market data, your rates are competitive for ${expYrs > 3 ? 'an experienced' : 'an emerging'} ${djType} DJ in ${location}.
+${expYrs < 3 ? '<br>💡 Consider free/reduced-rate gigs to build your portfolio faster.' : ''}
+${isFest ? '<br>🚀 Festival market is strong — push Premium hard!' : ''}`;
+
+  const dl = document.getElementById('pricingDownload');
+  dl.style.display = 'block';
+
+  addPricingMsg('agent', `✅ Done! I've generated 3 custom price tiers for you based on your ${expYrs} years of experience in ${location}.\n\nYour recommended rate starts at ${curr} ${s} per gig. See the tiers on the right.\n\nWant to restart with different answers? Just refresh this tab.`);
+  updateXP(50);
+}
+
+function pricingDownload() {
+  const { djType = 'DJ', exp = '?', location = '' } = pricingData;
+  const content = document.getElementById('pricingTiers').innerText;
+  const blob = new Blob([`BassFlow AI Pricing Quote
+========================
+Generated: ${new Date().toLocaleDateString()}
+Profile: ${djType}, ${exp} experience, ${location}
+
+${content}`], { type: 'text/plain' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'bassflow-pricing-quote.txt';
+  a.click();
+  updateXP(10);
+}
+
+// Init loop machine and pricing agent when their screens are shown
+const _origShowS = showS;
+
+/* ════════════════════════════════════
+   SCREEN INIT PATCHES
+════════════════════════════════════ */
+const _loopInited = {}; const _pricingInited = {};
+const _origShowSWrapped = window.showS || showS;
+function showSPatched(id, el) {
+  _origShowSWrapped(id, el);
+  if (id === 'sLoopMachine' && !_loopInited[id]) { _loopInited[id] = true; initLoopMachine(); }
+  if (id === 'sPricing'     && !_pricingInited[id]) { _pricingInited[id] = true; initPricingAgent(); }
+}
+document.querySelectorAll('[onclick*="showS("]').forEach(el => {
+  const m = el.getAttribute('onclick').match(/showS\('(\w+)',(.*?)\)/);
+  if (m) el.setAttribute('onclick', `showSPatched('${m[1]}',${m[2]})`);
+});
+
 /* ════════════════════════════════════
    PWA SERVICE WORKER
 ════════════════════════════════════ */
