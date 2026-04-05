@@ -1,0 +1,16 @@
+{
+  "name": "bassflow-sdk",
+  "version": "1.0.0",
+  "description": "Official JavaScript SDK for the BassFlow Drum & Bass Platform API",
+  "main": "bassflow-sdk.js",
+  "browser": "bassflow-sdk.js",
+  "types": "types.d.ts",
+  "keywords": ["bassflow", "drum and bass", "dnb", "music", "sdk", "api"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GetMediConnect/Bass-flow-v0.5"
+  },
+  "engines": { "node": ">=16" },
+  "files": ["bassflow-sdk.js", "types.d.ts", "README.md"]
+}

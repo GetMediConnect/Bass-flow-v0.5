@@ -1,0 +1,33 @@
+{
+  "appId": "com.bassflow.app",
+  "appName": "BassFlow",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "url": "https://bassflow.app",
+    "cleartext": false
+  },
+  "android": {
+    "buildOptions": {
+      "keystorePath": "bassflow.keystore",
+      "keystoreAlias": "bassflow",
+      "releaseType": "APK"
+    },
+    "minWebViewVersion": 60,
+    "backgroundColor": "#03030a"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "backgroundColor": "#03030a",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#03030a"
+    }
+  }
+}

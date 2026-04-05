@@ -1,33 +1,50 @@
 #!/bin/bash
-# deploy.sh – deploy BassWave na Google Cloud Run
-# Projekt GCP: gen-lang-client-0354485869
-# Użycie: ./deploy.sh [api|web|all]
+# ═══════════════════════════════════════════════════════════
+#  BassFlow — Deploy to Google Cloud Run
+#  GCP project: gen-lang-client-0354485869
+#  Usage: ./deploy.sh [api|all]
+# ═══════════════════════════════════════════════════════════
 
 set -e
 
 PROJECT_ID="gen-lang-client-0354485869"
 REGION="europe-west1"
 REGISTRY="gcr.io/${PROJECT_ID}"
-
 TARGET="${1:-all}"
 
-echo "🎛️  BassWave Deploy → GCP projekt: $PROJECT_ID"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "🎛️  BassFlow Deploy → GCP: $PROJECT_ID"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# ── Uwierzytelnienie ──────────────────────────────────
-gcloud config set project $PROJECT_ID
+# ── Authenticate ───────────────────────────────────────────
+gcloud config set project "$PROJECT_ID"
 gcloud auth configure-docker gcr.io --quiet
 
+# ── Validate required env vars ─────────────────────────────
+for VAR in JWT_SECRET; do
+  if [[ -z "${!VAR}" ]]; then
+    echo "❌  Required env var $VAR is not set."
+    exit 1
+  fi
+done
+
+# ── Deploy API ─────────────────────────────────────────────
 deploy_api() {
   echo ""
-  echo "📦 Buduję obraz API…"
-  docker build -t ${REGISTRY}/basswave-api:latest -f apps/api/Dockerfile .
-  docker push ${REGISTRY}/basswave-api:latest
+  echo "📦  Building API image…"
+  docker build \
+    --platform linux/amd64 \
+    -t "${REGISTRY}/bassflow-api:latest" \
+    -f api/Dockerfile \
+    ./api
 
-  echo "🚀 Deploying API na Cloud Run…"
-  gcloud run deploy basswave-api \
-    --image ${REGISTRY}/basswave-api:latest \
-    --region $REGION \
+  echo "📤  Pushing API image…"
+  docker push "${REGISTRY}/bassflow-api:latest"
+
+  echo "🚀  Deploying API to Cloud Run…"
+  gcloud run deploy bassflow-api \
+    --image "${REGISTRY}/bassflow-api:latest" \
+    --region "$REGION" \
     --platform managed \
     --allow-unauthenticated \
     --port 3001 \
@@ -35,58 +52,28 @@ deploy_api() {
     --cpu 1 \
     --min-instances 0 \
     --max-instances 10 \
-    --set-env-vars "\
-DATABASE_URL=${DATABASE_URL},\
-DIRECT_URL=${DIRECT_URL},\
-SUPABASE_URL=${SUPABASE_URL},\
-SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY},\
-JWT_SECRET=${JWT_SECRET},\
-NODE_ENV=production"
+    --set-env-vars "JWT_SECRET=${JWT_SECRET},NODE_ENV=production"
 
-  API_URL=$(gcloud run services describe basswave-api --region=$REGION --format='value(status.url)')
-  echo "✅ API live: $API_URL"
+  API_URL=$(gcloud run services describe bassflow-api \
+    --region="$REGION" --format='value(status.url)')
+  echo "✅  API live: $API_URL"
   export API_URL
 }
 
-deploy_web() {
-  echo ""
-  echo "📦 Buduję obraz Web…"
-
-  if [ -z "$API_URL" ]; then
-    API_URL=$(gcloud run services describe basswave-api --region=$REGION --format='value(status.url)' 2>/dev/null || echo "https://basswave-api-xxx-ew.a.run.app")
-  fi
-
-  docker build \
-    --build-arg VITE_API_URL=$API_URL \
-    -t ${REGISTRY}/basswave-web:latest \
-    -f apps/web/Dockerfile .
-  docker push ${REGISTRY}/basswave-web:latest
-
-  echo "🚀 Deploying Web na Cloud Run…"
-  gcloud run deploy basswave-web \
-    --image ${REGISTRY}/basswave-web:latest \
-    --region $REGION \
-    --platform managed \
-    --allow-unauthenticated \
-    --port 8080 \
-    --memory 256Mi \
-    --cpu 1 \
-    --min-instances 0 \
-    --max-instances 5
-
-  WEB_URL=$(gcloud run services describe basswave-web --region=$REGION --format='value(status.url)')
-  echo "✅ Web live: $WEB_URL"
-}
-
-case $TARGET in
+case "$TARGET" in
   api) deploy_api ;;
-  web) deploy_web ;;
-  all) deploy_api && deploy_web ;;
+  all) deploy_api ;;
   *)
-    echo "Użycie: ./deploy.sh [api|web|all]"
+    echo "Usage: ./deploy.sh [api|all]"
     exit 1
     ;;
 esac
 
 echo ""
-echo "🎉 Deploy zakończony!"
+echo "🎉  Deploy complete!"
+echo ""
+echo "   API:  ${API_URL:-run: deploy_api first}"
+echo ""
+echo "   Next steps:"
+echo "   • Update VITE_API_URL / bassflow_v6.html API_URL to point to $API_URL"
+echo "   • Build Android APK: ./android-build.sh twa release"

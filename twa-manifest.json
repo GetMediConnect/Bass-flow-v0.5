@@ -1,0 +1,40 @@
+{
+  "packageId": "com.bassflow.app",
+  "host": "bassflow.app",
+  "name": "BassFlow",
+  "launcherName": "BassFlow",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#03030a",
+  "navigationColor": "#03030a",
+  "navigationColorDark": "#03030a",
+  "navigationDividerColor": "#00ff9d",
+  "backgroundColor": "#03030a",
+  "startUrl": "/",
+  "iconUrl": "https://bassflow.app/icon-512.png",
+  "maskableIconUrl": "https://bassflow.app/icon-maskable.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "bassflow.keystore",
+    "alias": "bassflow"
+  },
+  "appVersionCode": 6,
+  "appVersionName": "6.0.0",
+  "minSdkVersion": 19,
+  "targetSdkVersion": 34,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "enableNotifications": false,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://bassflow.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": { "enabled": true },
+    "playBilling": { "enabled": false }
+  },
+  "alphaDependencies": { "enabled": false },
+  "enableSiteSettingsShortcut": true,
+  "isTrustedWebActivity": true,
+  "retainedBundles": []
+}
